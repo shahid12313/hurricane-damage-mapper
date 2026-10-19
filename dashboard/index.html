@@ -1,0 +1,300 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hurricane Damage Mapper</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+  :root {
+    --bg: #ffffff;
+    --panel: #f6f7f9;
+    --text: #1d2330;
+    --muted: #5b6475;
+    --border: #dde1e8;
+    --accent: #1f5fbf;
+    --no-damage: #2ca02c;
+    --minor-damage: #f2c14e;
+    --major-damage: #f28e2b;
+    --destroyed: #d62728;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #15181e;
+      --panel: #1d2129;
+      --text: #e6e9ef;
+      --muted: #9aa3b2;
+      --border: #2e3440;
+      --accent: #6aa3ff;
+    }
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: var(--bg); color: var(--text);
+    font: 14px/1.45 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+  .app { display: flex; height: 100%; }
+  aside { width: 340px; flex-shrink: 0; overflow-y: auto; border-right: 1px solid var(--border); padding: 16px; }
+  #map { flex: 1; }
+  h1 { font-size: 18px; margin: 0 0 2px; }
+  .sub { color: var(--muted); font-size: 12.5px; margin-bottom: 16px; }
+  section { background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 12px; margin-bottom: 12px; }
+  h2 { font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); margin: 0 0 8px; }
+  select { width: 100%; padding: 7px 8px; border-radius: 6px; border: 1px solid var(--border);
+    background: var(--bg); color: var(--text); font: inherit; }
+  .seg { display: flex; border: 1px solid var(--border); border-radius: 6px; overflow: hidden; margin-bottom: 8px; }
+  .seg button { flex: 1; padding: 6px 4px; border: 0; background: var(--bg); color: var(--text); font: inherit; font-size: 12.5px; cursor: pointer; }
+  .seg button + button { border-left: 1px solid var(--border); }
+  .seg button.on { background: var(--accent); color: #fff; }
+  .row { display: flex; align-items: center; gap: 8px; padding: 3px 0; }
+  .row label { display: flex; align-items: center; gap: 8px; flex: 1; cursor: pointer; }
+  .swatch { width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0; }
+  .count { font-variant-numeric: tabular-nums; color: var(--muted); }
+  .bar { height: 4px; border-radius: 2px; margin: 0 0 4px 20px; }
+  .stat { font-size: 22px; font-weight: 600; font-variant-numeric: tabular-nums; }
+  .note { color: var(--muted); font-size: 12px; margin-top: 6px; }
+  ol { margin: 0; padding-left: 20px; }
+  ol li { padding: 3px 0; cursor: pointer; }
+  ol li:hover { color: var(--accent); }
+  ol .tile-name { font-size: 12.5px; }
+  .pill { display: inline-block; font-size: 11px; padding: 0 6px; border-radius: 9px; color: #fff; margin-left: 4px; font-variant-numeric: tabular-nums; }
+  .leaflet-popup-content { font-size: 13px; }
+  .loading { position: absolute; z-index: 1000; top: 12px; left: 50%; transform: translateX(-50%);
+    background: var(--panel); color: var(--text); border: 1px solid var(--border); border-radius: 6px; padding: 6px 12px; display: none; }
+  @media (max-width: 760px) {
+    .app { flex-direction: column-reverse; }
+    aside { width: 100%; height: 45%; border-right: 0; border-top: 1px solid var(--border); }
+    #map { min-height: 55%; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside>
+    <h1>Hurricane Damage Mapper</h1>
+    <div class="sub">Building damage predicted from before/after satellite images (xBD validation and test tiles).</div>
+
+    <section>
+      <h2>Disaster</h2>
+      <select id="disaster"></select>
+    </section>
+
+    <section>
+      <h2>Buildings</h2>
+      <div class="seg" id="source">
+        <button data-v="predicted" class="on">Model prediction</button>
+        <button data-v="true">True labels</button>
+      </div>
+      <div id="levels"></div>
+      <div class="note" id="source-note"></div>
+    </section>
+
+    <section>
+      <h2>Satellite image</h2>
+      <div class="seg" id="imagery">
+        <button data-v="post" class="on">After</button>
+        <button data-v="pre">Before</button>
+        <button data-v="none">Basemap only</button>
+      </div>
+      <div class="note">Tile images appear when you zoom in.</div>
+    </section>
+
+    <section>
+      <h2>Model vs. true labels</h2>
+      <div class="stat" id="agreement">–</div>
+      <div class="note">Share of labeled buildings in this disaster where the model gave the same damage level.</div>
+    </section>
+
+    <section>
+      <h2>Hardest-hit areas</h2>
+      <ol id="priority"></ol>
+      <div class="note">Tiles ranked by predicted destroyed and major-damage buildings. Click one to zoom in.</div>
+    </section>
+  </aside>
+  <div id="map"></div>
+</div>
+<div class="loading" id="loading">Loading…</div>
+
+<script>
+const LEVELS = [
+  { id: 1, key: "no-damage", name: "No damage" },
+  { id: 2, key: "minor-damage", name: "Minor damage" },
+  { id: 3, key: "major-damage", name: "Major damage" },
+  { id: 4, key: "destroyed", name: "Destroyed" },
+];
+const css = getComputedStyle(document.documentElement);
+const COLOR = Object.fromEntries(LEVELS.map(l => [l.id, css.getPropertyValue("--" + l.key).trim()]));
+const DISASTER_LABELS = {
+  "hurricane-harvey": "Hurricane Harvey (Texas, 2017)",
+  "hurricane-florence": "Hurricane Florence (Carolinas, 2018)",
+  "hurricane-michael": "Hurricane Michael (Florida, 2018)",
+  "hurricane-matthew": "Hurricane Matthew (Haiti, 2016)",
+};
+const IMAGE_MIN_ZOOM = 15;
+
+const state = { disaster: null, source: "predicted", imagery: "post", visible: new Set([1, 2, 3, 4]) };
+let tiles = [], features = [], buildingLayer = null, tileLayer = null;
+const overlays = new Map();
+const cache = {};
+
+const map = L.map("map", { preferCanvas: true, zoomControl: true });
+const satellite = L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", {
+  maxZoom: 20, maxNativeZoom: 19, attribution: "Basemap © Esri, Maxar, Earthstar Geographics",
+}).addTo(map);
+const streets = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+  maxZoom: 20, maxNativeZoom: 19, attribution: "© OpenStreetMap contributors",
+});
+L.control.layers({ "Satellite": satellite, "Streets": streets }, null, { position: "topright" }).addTo(map);
+L.control.scale({ imperial: false }).addTo(map);
+
+function setSegment(id, value) {
+  document.querySelectorAll(`#${id} button`).forEach(b => b.classList.toggle("on", b.dataset.v === value));
+}
+
+function bindSegment(id, onChange) {
+  document.querySelectorAll(`#${id} button`).forEach(b => b.addEventListener("click", () => {
+    setSegment(id, b.dataset.v);
+    onChange(b.dataset.v);
+  }));
+}
+
+async function loadDisaster(name) {
+  if (!cache[name]) {
+    document.getElementById("loading").style.display = "block";
+    cache[name] = (await (await fetch(`data/${name}.geojson`)).json()).features;
+    document.getElementById("loading").style.display = "none";
+  }
+  return cache[name];
+}
+
+function popupFor(p) {
+  const level = id => LEVELS[id - 1].name;
+  if (p.source === "predicted") {
+    return `<b>Predicted: ${level(p.damage)}</b><br>Confidence ${(p.confidence * 100).toFixed(0)}%<br><span style="color:#888">${p.tile}</span>`;
+  }
+  const said = p.model_damage ? level(p.model_damage) : "no prediction";
+  const match = p.model_damage === p.damage ? "✓ matches" : "✗ differs";
+  return `<b>Labeled: ${level(p.damage)}</b><br>Model said: ${said} (${match})<br><span style="color:#888">${p.tile}</span>`;
+}
+
+function drawBuildings() {
+  if (buildingLayer) buildingLayer.remove();
+  const shown = features.filter(f => f.properties.source === state.source && state.visible.has(f.properties.damage));
+  buildingLayer = L.geoJSON(shown, {
+    style: f => ({ color: COLOR[f.properties.damage], weight: 1.5, fillColor: COLOR[f.properties.damage], fillOpacity: 0.45 }),
+    onEachFeature: (f, layer) => layer.bindPopup(popupFor(f.properties)),
+  }).addTo(map);
+  drawLevelCounts();
+}
+
+function drawLevelCounts() {
+  const counts = [0, 0, 0, 0];
+  features.forEach(f => { if (f.properties.source === state.source) counts[f.properties.damage - 1]++; });
+  const max = Math.max(...counts, 1);
+  document.getElementById("levels").innerHTML = LEVELS.map((l, i) => `
+    <div class="row"><label>
+      <input type="checkbox" data-level="${l.id}" ${state.visible.has(l.id) ? "checked" : ""}>
+      <span class="swatch" style="background:${COLOR[l.id]}"></span>${l.name}
+    </label><span class="count">${counts[i].toLocaleString()}</span></div>
+    <div class="bar" style="width:calc((100% - 20px) * ${counts[i] / max});background:${COLOR[l.id]}"></div>`).join("");
+  document.querySelectorAll("#levels input").forEach(cb => cb.addEventListener("change", () => {
+    const id = Number(cb.dataset.level);
+    cb.checked ? state.visible.add(id) : state.visible.delete(id);
+    drawBuildings();
+  }));
+  document.getElementById("source-note").textContent = state.source === "predicted"
+    ? "Outlines found by the model. Click a building for its predicted level and confidence."
+    : "Expert labels from xBD. Click a building to compare with the model.";
+}
+
+function drawAgreement() {
+  const labeled = features.filter(f => f.properties.source === "true");
+  const same = labeled.filter(f => f.properties.model_damage === f.properties.damage).length;
+  document.getElementById("agreement").textContent = labeled.length
+    ? `${(100 * same / labeled.length).toFixed(1)}%  (${same.toLocaleString()} of ${labeled.length.toLocaleString()})` : "–";
+}
+
+function drawPriority(disasterTiles) {
+  const ranked = disasterTiles
+    .map(t => ({ t, destroyed: t.predicted[3], major: t.predicted[2] }))
+    .filter(r => r.destroyed + r.major > 0)
+    .sort((a, b) => (b.destroyed * 2 + b.major) - (a.destroyed * 2 + a.major))
+    .slice(0, 10);
+  const list = document.getElementById("priority");
+  list.innerHTML = ranked.length ? ranked.map(r => `
+    <li data-tile="${r.t.tile}"><span class="tile-name">${r.t.tile.split("_").pop()}</span>
+      <span class="pill" style="background:${COLOR[4]}">${r.destroyed} destroyed</span>
+      <span class="pill" style="background:${COLOR[3]}">${r.major} major</span></li>`).join("")
+    : "<li>No damaged buildings predicted.</li>";
+  list.querySelectorAll("li[data-tile]").forEach(li => li.addEventListener("click", () => {
+    const tile = tiles.find(t => t.tile === li.dataset.tile);
+    map.fitBounds(tile.bounds);
+    history.replaceState(null, "", "#" + tile.tile);
+  }));
+}
+
+function drawTileOutlines(disasterTiles) {
+  if (tileLayer) tileLayer.remove();
+  tileLayer = L.layerGroup(disasterTiles.map(t =>
+    L.rectangle(t.bounds, { color: "#ffffff", weight: 1, opacity: 0.6, fill: false, interactive: false })
+  )).addTo(map);
+}
+
+function updateImagery() {
+  const showImages = state.imagery !== "none" && map.getZoom() >= IMAGE_MIN_ZOOM;
+  const view = map.getBounds().pad(0.2);
+  const wanted = new Set();
+  if (showImages) {
+    tiles.filter(t => t.disaster === state.disaster && view.intersects(L.latLngBounds(t.bounds)))
+      .forEach(t => wanted.add(`${t.tile}_${state.imagery}`));
+  }
+  for (const [key, layer] of overlays) {
+    if (!wanted.has(key)) { layer.remove(); overlays.delete(key); }
+  }
+  for (const key of wanted) {
+    if (!overlays.has(key)) {
+      const tile = tiles.find(t => key.startsWith(t.tile + "_"));
+      overlays.set(key, L.imageOverlay(`images/${key}.jpg`, tile.bounds, { opacity: 1 }).addTo(map).bringToBack());
+    }
+  }
+}
+
+async function selectDisaster(name) {
+  state.disaster = name;
+  const disasterTiles = tiles.filter(t => t.disaster === name);
+  features = await loadDisaster(name);
+  drawTileOutlines(disasterTiles);
+  drawBuildings();
+  drawAgreement();
+  drawPriority(disasterTiles);
+  map.fitBounds(L.latLngBounds(disasterTiles.flatMap(t => t.bounds)));
+  updateImagery();
+}
+
+async function init() {
+  const data = await (await fetch("data/tiles.json")).json();
+  tiles = data.tiles;
+  const disasters = [...new Set(tiles.map(t => t.disaster))].sort();
+  const select = document.getElementById("disaster");
+  select.innerHTML = disasters.map(d => {
+    const n = tiles.filter(t => t.disaster === d).length;
+    return `<option value="${d}">${DISASTER_LABELS[d] || d}</option>`;
+  }).join("");
+  select.addEventListener("change", () => selectDisaster(select.value));
+  bindSegment("source", v => { state.source = v; drawBuildings(); });
+  bindSegment("imagery", v => { state.imagery = v; overlays.forEach(l => l.remove()); overlays.clear(); updateImagery(); });
+  map.on("moveend", updateImagery);
+  // A link like index.html#hurricane-harvey_00000198 opens zoomed in on that tile
+  const linked = tiles.find(t => t.tile === location.hash.slice(1));
+  const start = linked ? linked.disaster : disasters.includes("hurricane-harvey") ? "hurricane-harvey" : disasters[0];
+  select.value = start;
+  await selectDisaster(start);
+  if (linked) map.fitBounds(linked.bounds);
+}
+
+init().catch(err => {
+  document.getElementById("map").innerHTML =
+    `<p style="padding:20px">Could not load data/tiles.json. Run <code>python -m src.predict</code> first, then serve this folder with <code>python -m http.server -d dashboard</code>.<br>${err}</p>`;
+});
+</script>
+</body>
+</html>

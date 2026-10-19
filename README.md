@@ -31,6 +31,16 @@ Rerunning a training command resumes from the last finished epoch. Checkpoints a
 
 `data/`, `outputs/` and `runs/` are git-ignored, so images and model weights never reach GitHub.
 
+## Map dashboard
+
+```bash
+/opt/anaconda3/bin/python3 -m src.predict                    # run both models on hurricane tiles (~25 min)
+/opt/anaconda3/bin/python3 -m http.server 8000 -d dashboard  # then open http://localhost:8000
+```
+
+Buildings are colored by predicted damage on a satellite basemap, with before/after tile images,
+a switch to the true labels for comparison, and a list of the hardest-hit tiles.
+
 ## Layout
 
 | Path | Purpose |
@@ -41,6 +51,8 @@ Rerunning a training command resumes from the last finished epoch. Checkpoints a
 | `src/train.py` | Phase 2: U-Net (ResNet-34) that finds buildings in the pre-disaster image |
 | `src/damage.py` | Phase 3: U-Net on pre + post images that labels each pixel's damage level, with xView2 scoring |
 | `src/progress.py` | Live training progress in the terminal |
+| `src/predict.py` | Phase 4: runs both models on tiles and exports map data (GeoJSON) for the dashboard |
+| `dashboard/index.html` | Phase 4: interactive damage map (Leaflet) |
 | `notebooks/01_explore_xbd.ipynb` | Dataset exploration and label statistics |
 | `notebooks/02_building_localization.ipynb` | Phase 2 results |
 | `notebooks/03_damage_classification.ipynb` | Phase 3 results and building-level confusion matrix |
@@ -62,6 +74,6 @@ Per-class damage F1: no damage 0.93, minor 0.22, major 0.59, destroyed 0.78.
 - [x] Building localization model
 - [x] Damage classification model (first version)
 - [ ] Improve minor-damage detection (class weights, tier3 data)
-- [ ] Map dashboard
+- [x] Map dashboard
 - [ ] Final evaluation on the `test` split
 - [ ] Report and presentation

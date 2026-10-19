@@ -4,6 +4,8 @@ data/*
 outputs/*
 !outputs/.gitkeep
 runs/
+dashboard/data/
+dashboard/images/
 *.tar
 *.tar.gz
 *.pth
