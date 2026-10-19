@@ -1,0 +1,16 @@
+# Dataset and generated files never go in git
+data/*
+!data/.gitkeep
+outputs/*
+!outputs/.gitkeep
+*.tar
+*.tar.gz
+*.pth
+*.pt
+
+# Python / Jupyter
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+.venv/
+.DS_Store
