@@ -11,11 +11,12 @@ import time
 from datetime import datetime, timedelta
 from pathlib import Path
 
+DAMAGE_COLUMNS = ["score", "damage_f1", "f1_minor-damage"]
 RUNS = [
-    ("Phase 2: find buildings", Path("runs/loc_resnet34"), "src.train", "f1", ["f1", "precision", "recall"]),
-    ("Phase 3: classify damage", Path("runs/damage_resnet34"), "src.damage", "score", ["score", "loc_f1", "damage_f1"]),
+    ("Phase 2: find buildings", Path("runs/loc_resnet34"), "src.train", "f1", ["f1", "precision", "recall"], 30),
+    ("Phase 3: classify damage", Path("runs/damage_resnet34"), "src.damage", "score", DAMAGE_COLUMNS, 30),
+    ("Phase 3 v2: minor weight + tier3", Path("runs/damage_v2"), "src.damage", "score", DAMAGE_COLUMNS, 25),
 ]
-EPOCHS = 30
 BAR_WIDTH = 30
 
 
@@ -31,15 +32,15 @@ def read_history(run_dir):
         return list(csv.DictReader(f))
 
 
-def show_run(title, run_dir, module, best_key, columns):
+def show_run(title, run_dir, module, best_key, columns, epochs):
     rows = read_history(run_dir)
-    running = is_running(module)
+    running = is_running(f"{module} --out-dir {run_dir}") or (module == "src.train" and is_running(module))
     done = len(rows)
-    status = "running" if running else ("finished" if done >= EPOCHS else ("waiting" if done == 0 else "stopped"))
+    status = "running" if running else ("finished" if done >= epochs else ("waiting" if done == 0 else "stopped"))
 
-    filled = BAR_WIDTH * done // EPOCHS
+    filled = BAR_WIDTH * done // epochs
     print(f"\n{title}  [{status}]")
-    print(f"  [{'#' * filled}{'.' * (BAR_WIDTH - filled)}] epoch {done}/{EPOCHS}")
+    print(f"  [{'#' * filled}{'.' * (BAR_WIDTH - filled)}] epoch {done}/{epochs}")
     if not rows:
         return
 
@@ -50,8 +51,8 @@ def show_run(title, run_dir, module, best_key, columns):
 
     minutes = [float(r["minutes"]) for r in rows]
     per_epoch = sum(minutes[-5:]) / len(minutes[-5:])
-    if running and done < EPOCHS:
-        finish = datetime.now() + timedelta(minutes=per_epoch * (EPOCHS - done))
+    if running and done < epochs:
+        finish = datetime.now() + timedelta(minutes=per_epoch * (epochs - done))
         print(f"  ~{per_epoch:.1f} min/epoch, expected to finish around {finish:%H:%M}")
 
 

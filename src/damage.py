@@ -165,6 +165,7 @@ def train_damage(
     max_train_tiles=None,
     max_val_tiles=None,
     pretrained=True,
+    class_weights=CLASS_WEIGHTS,
 ):
     """Train, evaluating on val_split after every epoch. Saves last.pt, best.pt (highest score) and history.csv."""
     data_root, out_dir = Path(data_root), Path(out_dir)
@@ -177,10 +178,10 @@ def train_damage(
     train_loader = DataLoader(train_ds, batch_size=batch_size, shuffle=True, num_workers=num_workers,
                               pin_memory=use_amp, drop_last=True, persistent_workers=num_workers > 0)
     val_loader = DataLoader(val_ds, batch_size=max(1, batch_size // 4), num_workers=num_workers)
-    print(f"device={device}  train tiles={len(train_ds)}  val tiles={len(val_ds)}")
+    print(f"device={device}  train tiles={len(train_ds)}  val tiles={len(val_ds)}  class weights={list(class_weights)}")
 
     model = build_model(pretrained).to(device)
-    weights = torch.tensor(CLASS_WEIGHTS, device=device)
+    weights = torch.tensor(class_weights, device=device, dtype=torch.float32)
     optimizer = torch.optim.AdamW(model.parameters(), lr=lr, weight_decay=1e-4)
     scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=epochs)
     scaler = torch.amp.GradScaler("cuda", enabled=use_amp)
@@ -244,6 +245,8 @@ if __name__ == "__main__":
     parser.add_argument("--epochs", type=int, default=30)
     parser.add_argument("--batch-size", type=int, default=8)
     parser.add_argument("--workers", type=int, default=4)
+    parser.add_argument("--class-weights", nargs=5, type=float, default=CLASS_WEIGHTS,
+                        metavar=("BG", "NO", "MINOR", "MAJOR", "DESTROYED"))
     args = parser.parse_args()
 
     train_damage(
@@ -254,4 +257,5 @@ if __name__ == "__main__":
         epochs=args.epochs,
         batch_size=args.batch_size,
         num_workers=args.workers,
+        class_weights=args.class_weights,
     )
