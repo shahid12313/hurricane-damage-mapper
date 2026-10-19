@@ -4,7 +4,7 @@ matplotlib
 pillow
 tifffile
 jupyter
-# Added in the modeling phase:
-# torch
-# torchvision
-# segmentation-models-pytorch
+opencv-python
+torch
+torchvision
+segmentation-models-pytorch

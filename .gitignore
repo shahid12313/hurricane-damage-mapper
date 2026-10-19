@@ -3,6 +3,7 @@ data/*
 !data/.gitkeep
 outputs/*
 !outputs/.gitkeep
+runs/
 *.tar
 *.tar.gz
 *.pth
