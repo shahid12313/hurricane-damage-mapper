@@ -166,8 +166,13 @@ def train_damage(
     max_val_tiles=None,
     pretrained=True,
     class_weights=CLASS_WEIGHTS,
+    init_from=None,
 ):
-    """Train, evaluating on val_split after every epoch. Saves last.pt, best.pt (highest score) and history.csv."""
+    """Train, evaluating on val_split after every epoch. Saves last.pt, best.pt (highest score) and history.csv.
+
+    init_from: a checkpoint (e.g. runs/damage_resnet34/best.pt) whose weights the model starts from,
+    instead of only the ImageNet encoder. Ignored when resuming a run.
+    """
     data_root, out_dir = Path(data_root), Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
     device = pick_device()
@@ -195,6 +200,9 @@ def train_damage(
         scheduler.load_state_dict(ckpt["scheduler"])
         start_epoch, best_score = ckpt["epoch"] + 1, ckpt["best_score"]
         print(f"resumed from epoch {start_epoch}, best score so far {best_score:.4f}")
+    elif init_from:
+        model.load_state_dict(torch.load(init_from, map_location=device)["model"])
+        print(f"starting from the weights in {init_from}")
 
     history_path = out_dir / "history.csv"
     for epoch in range(start_epoch, epochs):
@@ -245,6 +253,8 @@ if __name__ == "__main__":
     parser.add_argument("--epochs", type=int, default=30)
     parser.add_argument("--batch-size", type=int, default=8)
     parser.add_argument("--workers", type=int, default=4)
+    parser.add_argument("--lr", type=float, default=3e-4)
+    parser.add_argument("--init-from", help="checkpoint to start from, e.g. runs/damage_resnet34/best.pt")
     parser.add_argument("--class-weights", nargs=5, type=float, default=CLASS_WEIGHTS,
                         metavar=("BG", "NO", "MINOR", "MAJOR", "DESTROYED"))
     args = parser.parse_args()
@@ -258,4 +268,6 @@ if __name__ == "__main__":
         batch_size=args.batch_size,
         num_workers=args.workers,
         class_weights=args.class_weights,
+        lr=args.lr,
+        init_from=args.init_from,
     )

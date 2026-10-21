@@ -16,6 +16,7 @@ RUNS = [
     ("Phase 2: find buildings", Path("runs/loc_resnet34"), "src.train", "f1", ["f1", "precision", "recall"], 30),
     ("Phase 3: classify damage", Path("runs/damage_resnet34"), "src.damage", "score", DAMAGE_COLUMNS, 30),
     ("Phase 3 v2: minor weight + tier3", Path("runs/damage_v2"), "src.damage", "score", DAMAGE_COLUMNS, 25),
+    ("Phase 3 v3: balanced weights, from v1", Path("runs/damage_v3"), "src.damage", "score", DAMAGE_COLUMNS, 10),
 ]
 BAR_WIDTH = 30
 

@@ -8,3 +8,4 @@ opencv-python
 torch
 torchvision
 segmentation-models-pytorch
+python-docx

@@ -132,9 +132,9 @@ def true_buildings(label_path, level_prob):
     return result
 
 
-def export(splits, disaster_prefix="hurricane"):
+def export(splits, damage_run="runs/damage_v3", disaster_prefix="hurricane"):
     device = train.pick_device()
-    loc_model, dmg_model = load_models(device)
+    loc_model, dmg_model = load_models(device, damage_run=damage_run)
     (DASHBOARD / "data").mkdir(parents=True, exist_ok=True)
     (DASHBOARD / "images").mkdir(parents=True, exist_ok=True)
 
@@ -196,5 +196,6 @@ def export(splits, disaster_prefix="hurricane"):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Export model predictions for the map dashboard.")
     parser.add_argument("--splits", nargs="+", default=["hold", "test"])
+    parser.add_argument("--damage-run", default="runs/damage_v3", help="folder of the damage model to use")
     args = parser.parse_args()
-    export(args.splits)
+    export(args.splits, args.damage_run)
