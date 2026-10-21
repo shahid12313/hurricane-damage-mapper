@@ -77,6 +77,8 @@ CM2 = read_confusion("damage_v2")
 CM3 = read_confusion("damage_v3")
 CMF = CM3 or CM1
 AGREE = hurricane_agreement()
+TEST_PATH = ROOT / "runs" / "test_results.json"
+TEST = json.load(open(TEST_PATH)) if TEST_PATH.exists() else None
 
 
 def pct(x, digits=1):
@@ -390,6 +392,10 @@ p(f"Both models were trained entirely on a laptop (Apple M1 Pro). On the held-ou
   f"overall, {pct(building_accuracy(CMF))} of buildings receive the correct damage level. A failed intermediate attempt "
   "showed how class weights trade neighbouring damage levels off against each other. The project also found that the "
   "georeferencing tags in the xBD GeoTIFF files are offset by 10 to 30 metres, and corrected this using the label coordinates.")
+if TEST:
+    p(f"On the untouched test split, the final model reaches a score of **{TEST['damage_v3']['score']:.3f}** "
+      f"(building localization F1 {TEST['localization']['f1']:.3f}) and assigns the correct damage level to "
+      f"**{pct(TEST['damage_v3']['building_accuracy'])}** of buildings.")
 
 # ================================================================ PART A
 
@@ -590,8 +596,8 @@ bullets([
 ])
 
 h("6. Results", 1)
-p("All results in this section are on the **hold** split, which was used to choose the best training epoch. They may "
-  "therefore be slightly optimistic; the untouched **test** split is reserved for the final evaluation.")
+p("All results in this section and in Section 7 are on the **hold** split, which was used to choose the best training "
+  "epoch. They may therefore be slightly optimistic; the final results on the untouched **test** split are in Section 8.")
 
 h("6.1 Building localization", 2)
 table(["Metric", "Value"], [
@@ -723,22 +729,51 @@ figure("dashboard_overview.png", 6.5, "Dashboard overview: Hurricane Harvey tile
 figure("dashboard_zoom.png", 6.5, "Dashboard zoomed in on a flooded Harvey tile. The after image is placed on the "
        "satellite basemap, and predicted buildings sit on the houses, coloured by damage level.")
 
-h("8. Discussion and Limitations", 1)
+h("8. Final Evaluation on the Test Split", 1)
+p("Every run used the hold split to choose its best epoch, and the v2 and v3 designs were chosen after looking at hold "
+  "results, so hold scores are slightly optimistic. The test split (933 tiles) was never used for any decision. The "
+  "localization model, v1 and the final model v3 were each evaluated on it once, with `src/evaluate.py`.")
+if TEST:
+    L, T1, T3 = TEST["localization"], TEST["damage_v1"], TEST["damage_v3"]
+    table(["Metric", "Hold (v3)", "Test (v1)", "Test (v3, final)"], [
+        [label, f"{V3[key]:.3f}" if V3 and key in V3 else "—", f"{T1[key]:.3f}", f"{T3[key]:.3f}"]
+        for label, key in [("Score", "score"), ("Localization F1", "loc_f1"), ("Damage F1", "damage_f1"),
+                           ("F1 — no damage", "f1_no-damage"), ("F1 — minor damage", "f1_minor-damage"),
+                           ("F1 — major damage", "f1_major-damage"), ("F1 — destroyed", "f1_destroyed")]
+    ] + [["Building-level accuracy", pct(building_accuracy(CM3)) if CM3 else "—",
+          pct(T1["building_accuracy"]), pct(T3["building_accuracy"])]],
+        [2.4, 1.2, 1.2, 1.5], "Damage models on the test split, with the hold result of v3 for comparison.",
+        align_right=(1, 2, 3))
+    table(["Metric", "Hold", "Test"], [
+        ["Pixel F1", f"{LOC['f1']:.3f}", f"{L['f1']:.3f}"],
+        ["Precision", f"{LOC['precision']:.3f}", f"{L['precision']:.3f}"],
+        ["Recall", f"{LOC['recall']:.3f}", f"{L['recall']:.3f}"],
+    ], [2.0, 1.2, 1.2], "Localization model on the hold and test splits.", align_right=(1, 2))
+    gap = T3["score"] - V3["score"]
+    p(f"On the test split the final model reaches a score of **{T3['score']:.3f}** "
+      f"({'+' if gap >= 0 else '−'}{abs(gap):.3f} compared with hold) and assigns the correct damage level to "
+      f"**{pct(T3['building_accuracy'])}** of buildings. The improvement from v1 to v3 holds on unseen data "
+      f"({T1['score']:.3f} → {T3['score']:.3f}). These test-split figures are the project's reported results.")
+    p("[[Add one or two sentences of your own interpretation of the test results here.]]")
+else:
+    p("**Status:** the test evaluation has not been run yet (`python -m src.evaluate`).")
+
+h("9. Discussion and Limitations", 1)
 bullets([
     "**Minor damage is hard to see.** At about 0.5 m per pixel, the difference between no, minor and major damage is "
     "often a few pixels. Even human labellers disagree most on this level.",
     "**Touching buildings are merged.** Buildings are separated by finding connected regions, so adjacent houses become "
     "one predicted building. Top xView2 solutions split them with additional steps such as watershed segmentation.",
     "**Domain shift.** The training data is mostly US suburbs; performance drops on very different settlements (Haiti).",
-    "**Validation-based results.** Results are on the hold split, which was used to pick the best epoch. The final "
-    "numbers must come from the test split.",
+    "**Validation-based model choices.** Epochs and model versions were chosen on the hold split; only Section 8 "
+    "uses the untouched test split.",
     "**Single runs and combined changes.** Each configuration was trained once, so differences of a few points may "
     "partly be run-to-run noise. v3 changed several things at once (starting point, data, weights, learning rate), so "
     "its improvement cannot be attributed to any single change.",
     "**Simple architecture.** A 6-channel U-Net is simpler than the Siamese networks and ensembles used by top solutions.",
 ])
 
-h("9. Conclusion and Future Work", 1)
+h("10. Conclusion and Future Work", 1)
 p("This project delivered a complete, working system for building damage assessment after hurricanes: from raw "
   "satellite data, through two trained models, to an interactive map. Trained on a single laptop, it finds buildings "
   f"with a pixel F1 of {LOC['f1']:.3f}, reaches a damage score of {FINAL['score']:.3f} and assigns the correct damage "
@@ -747,7 +782,6 @@ p("This project delivered a complete, working system for building damage assessm
   "georeferencing error in the dataset's GeoTIFF metadata.")
 p("Future work, roughly in order of expected benefit:")
 bullets([
-    "Final evaluation on the untouched test split.",
     "A Siamese architecture that processes before and after images with a shared encoder.",
     "Separating touching buildings (for example with watershed segmentation).",
     "Ensembles and test-time augmentation (averaging predictions over flipped and rotated inputs).",

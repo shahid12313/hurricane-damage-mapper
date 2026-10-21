@@ -51,13 +51,23 @@ a switch to the true labels for comparison, and a list of the hardest-hit tiles.
 | `src/train.py` | Phase 2: U-Net (ResNet-34) that finds buildings in the pre-disaster image |
 | `src/damage.py` | Phase 3: U-Net on pre + post images that labels each pixel's damage level, with xView2 scoring |
 | `src/progress.py` | Live training progress in the terminal |
+| `src/evaluate.py` | Final evaluation of all models on the test split |
 | `src/predict.py` | Phase 4: runs both models on tiles and exports map data (GeoJSON) for the dashboard |
 | `dashboard/index.html` | Phase 4: interactive damage map (Leaflet) |
 | `notebooks/01_explore_xbd.ipynb` | Dataset exploration and label statistics |
 | `notebooks/02_building_localization.ipynb` | Phase 2 results |
 | `notebooks/03_damage_classification.ipynb` | Phase 3 results and building-level confusion matrix |
 
-## Results (validation on the `hold` split)
+## Final results (untouched `test` split, `python -m src.evaluate`)
+
+| Model | Metric | Test |
+|---|---|---|
+| Building localization | pixel F1 | 0.788 |
+| Damage v1 | xView2 score | 0.584 |
+| **Damage v3 (final)** | xView2 score | **0.702** |
+| **Damage v3 (final)** | building-level accuracy | **80.8%** |
+
+## Development results (validation on the `hold` split)
 
 | Model | Metric | Score |
 |---|---|---|
@@ -86,6 +96,6 @@ The full write-up is in `docs/Hurricane_Damage_Mapper_Report.docx` (rebuild with
 - [x] Damage classification model (first version)
 - [x] Improve minor-damage detection (v2 failed, v3 improved the score to 0.711)
 - [x] Map dashboard
-- [ ] Final evaluation on the `test` split
+- [x] Final evaluation on the `test` split (v3 score 0.702)
 - [x] Report draft (docs/)
 - [ ] Presentation
