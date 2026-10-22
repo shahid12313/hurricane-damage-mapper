@@ -79,6 +79,8 @@ CMF = CM3 or CM1
 AGREE = hurricane_agreement()
 TEST_PATH = ROOT / "runs" / "test_results.json"
 TEST = json.load(open(TEST_PATH)) if TEST_PATH.exists() else None
+GEO_PATH = ROOT / "outputs" / "georef_check.csv"
+GEO = __import__("pandas").read_csv(GEO_PATH) if GEO_PATH.exists() else None
 
 
 def pct(x, digits=1):
@@ -391,7 +393,8 @@ p(f"Both models were trained entirely on a laptop (Apple M1 Pro). On the held-ou
   f"minor-damage F1 (to {FINAL['f1_minor-damage']:.2f}), at the cost of more false alarms on undamaged buildings; "
   f"overall, {pct(building_accuracy(CMF))} of buildings receive the correct damage level. A failed intermediate attempt "
   "showed how class weights trade neighbouring damage levels off against each other. The project also found that the "
-  "georeferencing tags in the xBD GeoTIFF files are offset by 10 to 30 metres, and corrected this using the label coordinates.")
+  "georeferencing tags in the xBD GeoTIFF files misplace buildings by a median of 30 metres (up to 80 m, growing with "
+  "latitude) across the whole dataset, explained the cause, and corrected it using the label coordinates.")
 if TEST:
     p(f"On the untouched test split, the final model reaches a score of **{TEST['damage_v3']['score']:.3f}** "
       f"(building localization F1 {TEST['localization']['f1']:.3f}) and assigns the correct damage level to "
@@ -575,13 +578,40 @@ p("The models output per-pixel probabilities, but responders need buildings. For
 
 h("5.7 Georeferencing", 2)
 p("To place buildings on a map, pixel positions must be converted to longitude and latitude. The GeoTIFF files contain "
-  "georeferencing tags for this, but placing buildings with them put them 10 to 30 metres away from their positions "
-  "in the label files. The label files list every building both in pixel coordinates and in longitude/latitude, and "
-  "fitting a linear (affine) transform between the two reproduces the label coordinates to within 1 cm.")
-p("The label transform is also the physically correct one. At Houston's latitude (about 30°), a square ground pixel "
-  "spans about 1.15 times as many degrees of longitude as of latitude, because meridians converge towards the poles. "
-  "The label transform has a ratio of 1.146, while the GeoTIFF tags claim exactly 1.0. The pipeline therefore "
-  "georeferences each tile from its label coordinates and falls back to the GeoTIFF tags only for tiles with no buildings.")
+  "georeferencing tags for this (a tiepoint and a pixel size), and the label files list every building both in pixel "
+  "coordinates and in longitude/latitude. When predictions were first placed using the GeoTIFF tags, buildings landed "
+  "tens of metres away from the corresponding labelled buildings. The two sources were therefore compared on every "
+  "image in the dataset with `src/check_georef.py`.")
+if GEO is not None:
+    g = GEO.dropna(subset=["offset_median_m"])
+    ratio = g.label_ratio / g.expected_ratio
+    table(["Measurement (all images with buildings)", "Result"], [
+        ["Images checked", f"{len(g):,} of {len(GEO):,}"],
+        ["Offset between GeoTIFF tags and labels, median per image", f"{g.offset_median_m.median():.1f} m"],
+        ["Images offset by more than 10 m", pct((g.offset_median_m > 10).mean())],
+        ["Largest offset", f"{g.offset_max_m.max():.0f} m"],
+        ["Labels explained by one affine transform (to 0.1 m)", pct((g.label_fit_max_m < 0.1).mean())],
+        ["GeoTIFF ratio of longitude to latitude degrees per pixel", f"{g.tif_ratio.min():.3f} in every image"],
+        ["Label ratio relative to square ground pixels, median", f"{ratio.median():.3f}"],
+    ], [4.4, 2.0], "Comparison of GeoTIFF georeferencing with label coordinates across the whole dataset.", align_right=(1,))
+    by = g.groupby("disaster").agg(lat=("lat", "mean"), off=("offset_median_m", "median")).sort_values("lat", key=abs)
+    pick = [d for d in ["palu-tsunami", "hurricane-matthew", "hurricane-harvey", "hurricane-florence", "portugal-wildfire"] if d in by.index]
+    table(["Disaster", "Latitude", "Median offset"], [[d, f"{by.loc[d, 'lat']:.1f}°", f"{by.loc[d, 'off']:.1f} m"] for d in pick],
+          [2.6, 1.3, 1.5], "The offset grows with distance from the equator.", align_right=(1, 2))
+p("The pattern identifies the cause. Every GeoTIFF uses the same pixel size in degrees for longitude and latitude, "
+  "which is only correct at the equator: away from it, meridians converge, so a pixel that is square on the ground "
+  "spans 1 / cos(latitude) times as many degrees of longitude as of latitude (about 1.15 at Houston). The label "
+  "coordinates follow this geometry, the GeoTIFF tags do not, and the error grows with latitude exactly as this "
+  "explanation predicts: about 1 m near the equator and almost 50 m at 40°.")
+p("As an independent check, a Hurricane Florence tile was placed on a satellite basemap from a different provider "
+  "(Esri) both ways (Figure below). With the label coordinates the tile lines up with the basemap; with the GeoTIFF "
+  "tags it is visibly stretched and shifted, so every building appears doubled.")
+figure("georef_comparison.jpg", 6.5, "The same Hurricane Florence tile (33.6°N) placed on an independent satellite basemap "
+       "using the label coordinates (left, aligned) and the GeoTIFF tags (right, shifted and stretched).")
+p("The pipeline therefore georeferences each tile from its label coordinates and falls back to the GeoTIFF tags only "
+  "for tiles without buildings. A quick search found no published report of this issue for xBD "
+  "[[confirm with a search of the xView2 GitHub issues and the xBD paper before calling it a new finding]]; it matters "
+  "for anyone who overlays xBD predictions on other map data, such as roads, flood extents or census areas.")
 
 h("5.8 Dashboard", 2)
 p("The dashboard is a single web page built with Leaflet, an open-source mapping library. It loads the exported "
@@ -639,11 +669,11 @@ figure("damage_curves.png", 6.3, "v1 training loss and validation scores per epo
 figure("damage_prediction.jpg", 6.5, "v1 damage prediction on a Hurricane Michael validation tile.")
 
 h("6.3 Context", 2)
-p("For orientation only: the official xView2 baseline reported an overall score of roughly 0.27, and the winning "
-  "solution roughly 0.80, using large ensembles of models [[verify these figures against the xView2 leaderboard before submission]]. "
-  f"Those scores are on the challenge's own test set, so they are not directly comparable with the hold-split scores "
-  f"here (v1 {V1['score']:.3f}, final model {FINAL['score']:.3f}), but they show that a single model trained on a laptop "
-  "reaches a meaningful level.")
+p("For orientation: Chen et al. (2022) report the official xView2 baseline at an overall score of 0.265, and a single "
+  "ResNet-34 version of the first-place Siamese U-Net at 0.717, on the xBD test set; the full first-place solution, an "
+  "ensemble of many models, scored higher. The final model here reaches 0.702 on the test split (Section 8) with a "
+  "simpler single U-Net trained on a laptop [[check that Chen et al. used the same 933 test tiles before quoting the "
+  "comparison as exact]].")
 
 h("7. Improving the Damage Model", 1)
 p("The v1 results point to minor damage as the main weakness. Two further versions were trained to address it.")
@@ -794,6 +824,8 @@ for ref in [
     "(2019). Creating xBD: A dataset for assessing building damage from satellite imagery. CVPR Workshops.",
     "Ronneberger, O., Fischer, P., & Brox, T. (2015). U-Net: Convolutional networks for biomedical image segmentation. MICCAI.",
     "He, K., Zhang, X., Ren, S., & Sun, J. (2016). Deep residual learning for image recognition. CVPR.",
+    "Chen, H., Nemni, E., Vallecorsa, S., Li, X., Wu, C., & Bromley, L. (2022). Dual-tasks Siamese transformer "
+    "framework for building damage assessment. arXiv:2201.10953.",
     "Iakubovskii, P. (2019). Segmentation Models PyTorch. GitHub repository, qubvel/segmentation_models.pytorch.",
     "xView2 challenge: Computer vision for building damage assessment. https://xview2.org",
 ]:
@@ -946,6 +978,12 @@ h("B.10 src/progress.py — watching training", 2)
 p("A small terminal display that reads each run's `history.csv` every 30 seconds and shows a progress bar, the "
   "latest and best scores, and an estimated finish time. It only reads files, so it can be started and stopped at any "
   "time without affecting training.")
+
+h("B.10b src/evaluate.py and src/check_georef.py — final checks", 2)
+p("`src/evaluate.py` scores the localization model, v1 and v3 once on the test split and writes "
+  "`runs/test_results.json` (Section 8). `src/check_georef.py` compares the GeoTIFF georeferencing of every image with "
+  "the coordinates in its label file and writes `outputs/georef_check.csv` (Section 5.7); it reads only label files and "
+  "image headers, so it runs over all 22,068 images in under a minute.")
 
 h("B.11 dashboard/index.html — the map", 2)
 p("A single HTML page with embedded JavaScript, using Leaflet for the map. It needs a local web server because browsers "
