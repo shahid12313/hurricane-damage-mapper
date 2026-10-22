@@ -276,7 +276,6 @@ async function init() {
   const disasters = [...new Set(tiles.map(t => t.disaster))].sort();
   const select = document.getElementById("disaster");
   select.innerHTML = disasters.map(d => {
-    const n = tiles.filter(t => t.disaster === d).length;
     return `<option value="${d}">${DISASTER_LABELS[d] || d}</option>`;
   }).join("");
   select.addEventListener("change", () => selectDisaster(select.value));

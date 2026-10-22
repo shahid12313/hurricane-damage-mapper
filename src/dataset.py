@@ -10,7 +10,7 @@ from torch.utils.data import Dataset
 # OpenCV's own thread pool can deadlock inside DataLoader worker processes
 cv2.setNumThreads(0)
 
-IMAGENET_MEAN =np.array([0.485, 0.456, 0.406], dtype=np.float32)
+IMAGENET_MEAN = np.array([0.485, 0.456, 0.406], dtype=np.float32)
 IMAGENET_STD = np.array([0.229, 0.224, 0.225], dtype=np.float32)
 
 

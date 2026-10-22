@@ -2,9 +2,9 @@
 
 Expected layout after extracting the download:
 
-    data/xbd/train/images/hurricane-harvey_00000001_pre_disaster.tif   (.png in the smaller release)
-    data/xbd/train/images/hurricane-harvey_00000001_post_disaster.tif
-    data/xbd/train/labels/hurricane-harvey_00000001_post_disaster.json
+    data/xbd/tier1/images/hurricane-harvey_00000001_pre_disaster.tif   (.png in the smaller release)
+    data/xbd/tier1/images/hurricane-harvey_00000001_post_disaster.tif
+    data/xbd/tier1/labels/hurricane-harvey_00000001_post_disaster.json
     ...
 
 The same layout repeats for tier3/, test/ and hold/.

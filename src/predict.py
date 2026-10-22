@@ -77,7 +77,8 @@ def georeference(label_path, tif_path):
 
     The label file lists every building both in pixels and in longitude/latitude, which fixes an
     exact affine transform. The GeoTIFF tags are used only for tiles without buildings: they claim
-    square pixels in degrees, which is wrong away from the equator and shifts buildings by 10-30 m.
+    square pixels in degrees, which is wrong away from the equator and shifts buildings by about
+    30 m (up to 84 m; see src/check_georef.py).
     """
     with open(label_path) as f:
         features = json.load(f)["features"]

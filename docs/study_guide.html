@@ -1,0 +1,3276 @@
+<title>Hurricane Damage Mapper Study Guide</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,500;6..72,650&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<style>
+/* Layout: a single reading column; code chunks go two-up (code | explanation) on wide screens. */
+:root {
+  --bg: #f4f6f7; --surface: #ffffff; --ink: #18222c; --muted: #55626e; --line: #d8dee3;
+  --accent: #b4521a; --link: #1d5c9c; --code-bg: #eef2f4; --code-ink: #1d2833;
+  --hl-key: #8a3ea8; --hl-str: #2c7a39; --hl-num: #b4521a; --hl-com: #6c7884; --hl-fn: #1d5c9c;
+  --display: "Newsreader", Georgia, serif; --body: "Source Sans 3", "Segoe UI", Arial, sans-serif;
+  --mono: "JetBrains Mono", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #11171c; --surface: #182027; --ink: #e2e8ed; --muted: #9eabb6; --line: #2b3640;
+  --accent: #f0955a; --link: #7db4ec; --code-bg: #141b21; --code-ink: #dbe3ea;
+  --hl-key: #d29ef0; --hl-str: #8fd19a; --hl-num: #f0b07a; --hl-com: #7f8d99; --hl-fn: #8cc3f5; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #11171c; --surface: #182027; --ink: #e2e8ed; --muted: #9eabb6; --line: #2b3640;
+  --accent: #f0955a; --link: #7db4ec; --code-bg: #141b21; --code-ink: #dbe3ea;
+  --hl-key: #d29ef0; --hl-str: #8fd19a; --hl-num: #f0b07a; --hl-com: #7f8d99; --hl-fn: #8cc3f5; color-scheme: dark }
+body { background: var(--bg); color: var(--ink); font: 17px/1.6 var(--body);
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.wrap { max-width: 1180px; margin: 0 auto; padding-block: 48px 96px; display: flex; flex-direction: column; gap: 56px; }
+h1, h2, h3 { font-family: var(--display); font-weight: 650; line-height: 1.15; text-wrap: balance; margin: 0; }
+h1 { font-size: clamp(34px, 5vw, 52px); }
+h2 { font-size: clamp(26px, 3.4vw, 34px); padding-top: 8px; border-top: 2px solid var(--ink); }
+h3 { font-size: 22px; }
+p, li { max-width: 68ch; }
+a { color: var(--link); }
+code { font-family: var(--mono); font-size: 0.86em; background: var(--code-bg); color: var(--code-ink); padding: 1px 5px; border-radius: 4px; }
+.lede { font-size: 20px; color: var(--muted); max-width: 62ch; }
+.eyebrow { font: 600 13px/1.4 var(--body); letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); margin: 0; max-width: none; }
+header { display: flex; flex-direction: column; gap: 14px; }
+.section { display: flex; flex-direction: column; gap: 20px; }
+nav.toc { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 8px 32px; background: var(--surface);
+  border: 1px solid var(--line); border-radius: 10px; padding: 20px 24px; }
+nav.toc ol, nav.toc ul { margin: 6px 0 0; padding-left: 20px; }
+nav.toc li { margin: 2px 0; }
+.howto { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
+.howto div { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 16px 18px; }
+.howto b { display: block; font-family: var(--display); font-size: 19px; margin-bottom: 4px; }
+pre.mermaid { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 20px; overflow-x: auto; text-align: center; }
+.concepts { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px; }
+.concept { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 18px 20px; min-width: 0; }
+.concept h3 { font-size: 19px; margin-bottom: 6px; }
+.concept p { margin: 0; }
+ol.timeline { list-style: none; counter-reset: step; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 18px; }
+ol.timeline > li { counter-increment: step; position: relative; padding-left: 52px; min-width: 0; }
+ol.timeline > li::before { content: counter(step); position: absolute; left: 0; top: 0; width: 34px; height: 34px; border-radius: 50%;
+  background: var(--ink); color: var(--bg); font: 600 15px/34px var(--body); text-align: center; font-variant-numeric: tabular-nums; }
+.t-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; }
+.t-head h3 { font-size: 20px; }
+.t-date { font: 600 13px var(--body); color: var(--accent); letter-spacing: 0.04em; }
+ol.timeline p { margin: 6px 0; }
+pre.cmd { font: 13.5px/1.5 var(--mono); background: var(--code-bg); color: var(--code-ink); padding: 10px 14px; border-radius: 8px;
+  overflow-x: auto; margin: 6px 0 0; white-space: pre; }
+.file { display: flex; flex-direction: column; gap: 18px; padding-top: 8px; }
+.file h3 { display: flex; flex-wrap: wrap; align-items: baseline; gap: 12px; font-size: 24px; }
+.file h3 code { background: none; padding: 0; font-size: 22px; color: var(--ink); }
+.meta { font: 600 13px var(--body); color: var(--muted); }
+.chunk { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 20px 28px; padding: 16px 0; border-top: 1px solid var(--line); }
+.chunk-code, .chunk-text { min-width: 0; }
+.chunk-text p:first-child { margin-top: 0; }
+.chunk-text ul, .chunk-text ol { padding-left: 20px; }
+.where { font: 600 12px var(--body); letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); margin: 0 0 6px; }
+.code { display: flex; background: var(--code-bg); border-radius: 8px; overflow-x: auto; }
+.code pre { margin: 0; padding: 12px 0; font: 13px/1.55 var(--mono); }
+pre.ln { color: var(--muted); text-align: right; padding-left: 12px; padding-right: 12px; border-right: 1px solid var(--line); user-select: none; flex: none; opacity: 0.8; }
+pre.src { padding-left: 14px; padding-right: 16px; color: var(--code-ink); flex: 1; }
+pre.src code { background: none; padding: 0; font-size: inherit; color: inherit; }
+details.long > summary { cursor: pointer; font: 600 14px var(--body); color: var(--link); padding: 8px 0; }
+.hljs-keyword, .hljs-built_in, .hljs-literal, .hljs-meta { color: var(--hl-key); }
+.hljs-string, .hljs-attr, .hljs-template-variable { color: var(--hl-str); }
+.hljs-number { color: var(--hl-num); }
+.hljs-comment, .hljs-doctag { color: var(--hl-com); font-style: italic; }
+.hljs-title, .hljs-title.function_, .hljs-name, .hljs-selector-tag { color: var(--hl-fn); }
+table.results { border-collapse: collapse; width: 100%; max-width: 760px; font-variant-numeric: tabular-nums; }
+.table-wrap { overflow-x: auto; }
+table.results th, table.results td { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--line); }
+table.results th { font: 600 13px var(--body); letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted); }
+table.results td:not(:first-child) { white-space: nowrap; }
+details.q { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 14px 18px; }
+details.q summary { cursor: pointer; font-weight: 600; }
+details.q p { margin: 10px 0 0; }
+:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; }
+@media (max-width: 860px) { .chunk { grid-template-columns: minmax(0, 1fr); } body { font-size: 16px; } }
+</style>
+
+<div class="wrap">
+<header>
+  <p class="eyebrow">Hurricane Damage Mapper · Master’s project · Lamar University</p>
+  <h1>Study guide: the whole project, step by step</h1>
+  <p class="lede">Every concept, every step that was run, and every code file chunk by chunk with line numbers, so you can explain any part of the project in your own words.</p>
+</header>
+
+<section class="section">
+  <div class="howto">
+    <div><b>New to deep learning?</b>Read “Concepts” first. Each card explains one idea with this project’s own numbers.</div>
+    <div><b>Want the story?</b>“What was done, in order” lists every step from download to final test, with the commands.</div>
+    <div><b>Preparing for questions?</b>Read the code walkthrough with the file open in VS Code, then try “Test yourself”.</div>
+  </div>
+  <nav class="toc" aria-label="Contents">
+    <div><strong>Contents</strong>
+      <ol>
+        <li><a href="#picture">The project in one picture</a></li>
+        <li><a href="#concepts">Concepts</a></li>
+        <li><a href="#timeline">What was done, in order</a></li>
+        <li><a href="#one-step">One training step, traced</a></li>
+        <li><a href="#code">The code, file by file</a></li>
+        <li><a href="#results">The results</a></li>
+        <li><a href="#quiz">Test yourself</a></li>
+      </ol>
+    </div>
+    <div><strong>Code files</strong><ul><li><a href="#src-xbd-py">src/xbd.py</a></li><li><a href="#src-preprocess-py">src/preprocess.py</a></li><li><a href="#src-dataset-py">src/dataset.py</a></li><li><a href="#src-train-py">src/train.py</a></li><li><a href="#src-damage-py">src/damage.py</a></li><li><a href="#src-predict-py">src/predict.py</a></li><li><a href="#src-evaluate-py">src/evaluate.py</a></li><li><a href="#src-check-georef-py">src/check_georef.py</a></li><li><a href="#src-validate-osm-py">src/validate_osm.py</a></li><li><a href="#src-progress-py">src/progress.py</a></li><li><a href="#dashboard-index-html">dashboard/index.html</a></li></ul></div>
+  </nav>
+</section>
+
+<section class="section" id="picture">
+  <h2>The project in one picture</h2>
+  <p>Raw satellite data goes through two trained models; their predictions become buildings on a map. The file that does each step is named in the box.</p>
+<pre class="mermaid">
+flowchart LR
+  A["Raw xBD: GeoTIFF images and JSON labels (130 GB)"] --> B["preprocess.py: JPEG images and masks (9 GB)"]
+  B --> C["train.py: model 1 finds buildings"]
+  B --> D["damage.py: model 2 classifies damage"]
+  C --> E["predict.py: buildings, damage, map coordinates"]
+  D --> E
+  E --> F["dashboard/index.html: interactive map"]
+  C --> G["evaluate.py: final test scores"]
+  D --> G
+</pre>
+</section>
+
+<section class="section" id="concepts">
+  <h2>Concepts</h2>
+  <p>The ideas the code relies on, in the order they build on each other.</p>
+  <div class="concepts"><div class="concept"><h3>Images are arrays of numbers</h3><p>A colour image of 1024 × 1024 pixels is three grids of numbers, one each for red, green and blue, each from 0 to 255. In code it is an <b>array</b> of shape <code>(1024, 1024, 3)</code>. A <b>tensor</b> is the same idea in PyTorch: a multi-dimensional array that can live on the GPU and remember how it was computed. A batch of 8 crops is a tensor of shape <code>(8, 3, 512, 512)</code>: 8 images, 3 colour channels, 512 rows, 512 columns.</p></div><div class="concept"><h3>Supervised learning</h3><p>The model learns from examples where the answer is known: for every xBD tile, experts drew each building and gave it a damage level. Training shows the model an image, compares its answer with the expert answer, and adjusts the model to be a little less wrong. Repeat hundreds of thousands of times.</p></div><div class="concept"><h3>Segmentation</h3><p>Most image models give one answer per image ("cat"). <b>Segmentation</b> gives one answer per pixel ("building", "background"). Both models here are segmentation models; buildings are found afterwards by grouping pixels.</p></div><div class="concept"><h3>Neural networks and parameters</h3><p>A neural network is a long chain of simple calculations (multiply by a weight, add, apply a simple non-linear function), with millions of adjustable numbers called <b>parameters</b> or weights. Our models have about 24.4 million. Training means finding parameter values that make the outputs match the answers.</p></div><div class="concept"><h3>Convolution</h3><p>Image networks use <b>convolutions</b>: a small grid of weights (for example 3 × 3) slides over the image and computes a weighted sum at each position. Early layers learn to detect edges and colours; deeper layers combine them into corners, roofs and building shapes.</p></div><div class="concept"><h3>U-Net: encoder and decoder</h3><p>A <b>U-Net</b> has two halves. The <b>encoder</b> shrinks the image step by step (512 → 256 → … → 16 pixels wide) while learning more abstract features ("roof texture here"). The <b>decoder</b> expands back to full size to give an answer per pixel. <b>Skip connections</b> pass detail from each encoder level to the matching decoder level, so edges stay sharp. Drawn as a diagram, it looks like a U.</p></div><div class="concept"><h3>ResNet-34 and transfer learning</h3><p>The encoder is a <b>ResNet-34</b>, a well-known 34-layer network whose "residual" shortcuts make deep networks trainable. Its weights were <b>pretrained</b> on ImageNet, 1.2 million everyday photos, so it already recognises edges, textures and shapes. Starting from that knowledge is called <b>transfer learning</b>; it needs far less data and time than starting from random weights.</p></div><div class="concept"><h3>Logits, sigmoid and softmax</h3><p>A network's raw outputs are <b>logits</b>: any numbers, positive or negative. <b>Sigmoid</b> turns one logit into a probability between 0 and 1 (used for building vs background). <b>Softmax</b> turns several logits into probabilities that add up to 1 (used for the five damage classes).</p></div><div class="concept"><h3>Loss</h3><p>The <b>loss</b> is one number that says how wrong the model is on a batch; training makes it smaller. <b>Cross-entropy</b> is large when the model gives a low probability to the correct answer. <b>Dice loss</b> measures overlap of areas. <b>Class weights</b> make mistakes on rare classes cost more.</p></div><div class="concept"><h3>Gradients, backpropagation and the optimizer</h3><p>For each parameter, the <b>gradient</b> says how the loss changes if that parameter increases a little. <b>Backpropagation</b> computes all 24.4 million gradients efficiently, layer by layer from the output back to the input. The <b>optimizer</b> (here AdamW) then moves every parameter a small step against its gradient. The size of that step is the <b>learning rate</b> (0.0003, later 0.0001).</p></div><div class="concept"><h3>Batch, iteration, epoch</h3><p>A <b>batch</b> is a group of examples processed together (8 crops). One <b>iteration</b> is one batch: forward, loss, backward, update. One <b>epoch</b> is one pass over all training tiles: 349 iterations for tier1, 1,146 for tier1 + tier3. Models v1 and the localization model trained for 30 epochs, v2 for 25, v3 for 10.</p></div><div class="concept"><h3>Augmentation and overfitting</h3><p><b>Overfitting</b> is memorising the training examples instead of learning the general pattern; the model then does badly on new images. <b>Augmentation</b> (random crops, flips, rotations) and <b>weight decay</b> reduce it. The "overfit tests" in this project did the opposite on purpose: train on 8 tiles until memorised, just to prove the code can learn at all.</p></div><div class="concept"><h3>Training, validation and test splits</h3><p>Data is split three ways. <b>Training</b> data (tier1, later tier3) is what the model learns from. <b>Validation</b> data (hold) is used to choose between options, such as the best epoch or v1 vs v3. <b>Test</b> data is used exactly once at the end; because nothing was chosen with it, its score is the honest estimate of performance on new data.</p></div><div class="concept"><h3>Precision, recall, F1</h3><p><b>Precision</b>: of everything the model called a building, the share that really is. <b>Recall</b>: of all real buildings, the share the model found. <b>F1</b> = 2 × precision × recall / (precision + recall): high only when both are high. A model that calls everything a building has perfect recall and terrible precision, and a low F1.</p></div><div class="concept"><h3>The xView2 score and the harmonic mean</h3><p>Score = 0.3 × localization F1 + 0.7 × damage F1. The damage F1 is the <b>harmonic mean</b> of the four per-level F1 values, which is dominated by the weakest: for example F1 values of 0.9, 0.9, 0.9 and 0.1 give a harmonic mean of only 0.3. This is why ignoring a rare damage level is heavily punished.</p></div><div class="concept"><h3>Confusion matrix</h3><p>A table with true classes as rows and predicted classes as columns. Each cell counts how many buildings of that true level got that predicted level. The diagonal holds correct answers; everything else shows which mistakes are made, such as "minor called major".</p></div><div class="concept"><h3>Checkpoints</h3><p>A <b>checkpoint</b> is a file with the model's parameters (and, for resuming, the optimizer state and epoch). <code>best.pt</code> is the epoch with the best validation score; <code>last.pt</code> is the latest, for resuming.</p></div><div class="concept"><h3>GPU, MPS and DataLoader workers</h3><p>Neural networks are mostly large multiplications, which a GPU does in parallel. On Apple Silicon, PyTorch uses the GPU through <b>MPS</b>. While the GPU computes, <b>DataLoader workers</b> (separate processes) read and prepare the next images on the CPU, so the GPU never waits.</p></div><div class="concept"><h3>Georeferencing, WKT, GeoJSON, affine transforms</h3><p><b>Georeferencing</b> means knowing where on Earth each pixel is. <b>WKT</b> and <b>GeoJSON</b> are text formats for shapes. An <b>affine transform</b> converts pixel (x, y) to (longitude, latitude) with six numbers: it can shift, scale, rotate and shear. A degree of longitude is about 111 km at the equator but only 96 km at Houston (30°N), because longitude lines meet at the poles; ignoring that is exactly the mistake in the GeoTIFF tags.</p></div></div>
+</section>
+
+<section class="section" id="timeline">
+  <h2>What was done, in order</h2>
+  <p>Every major step of the project, with the command that ran it. Commands use <code>python</code> as short for Anaconda’s <code>/opt/anaconda3/bin/python3</code> and run from the project folder.</p>
+  <ol class="timeline"><li><div class="t-head"><span class="t-date">28 Sep</span><h3>Set up the project</h3></div><p>Created the folders (<code>src</code>, <code>notebooks</code>, <code>data</code>, <code>outputs</code>), <code>README.md</code>, <code>requirements.txt</code> and <code>.gitignore</code>, wrote <code>src/xbd.py</code> and notebook 01, and tested both on a small fake dataset because the real one was not downloaded yet.</p></li><li><div class="t-head"><span class="t-date">18 Oct</span><h3>Downloaded and extracted xBD</h3></div><p>You downloaded the full GeoTIFF release as 6 parts (55 GB). They were joined and unpacked in one pass, giving 130 GB in four folders: tier1 (2,799 pairs), tier3 (6,369), hold (933) and test (933).</p><pre class="cmd">cat xview2_geotiff.tgz.part-a? | tar xzf - -C data/xbd --strip-components=1</pre></li><li><div class="t-head"><span class="t-date">18 Oct</span><h3>Fixed three surprises</h3></div><p>The images were 16-bit, which Pillow cannot read, so <code>load_image</code> was added using <code>tifffile</code>. The training folder was called <code>tier1</code>, not <code>train</code>. And your default <code>python3</code> had changed to an install without Jupyter, so the project switched to Anaconda's Python at <code>/opt/anaconda3/bin/python3</code>.</p></li><li><div class="t-head"><span class="t-date">18 Oct</span><h3>Explored the data (notebook 01)</h3></div><p>162,787 buildings in tier1 from 10 disasters: 72% no damage, 9% minor, 9% major, 8% destroyed. Harvey was mostly flooding (36% major, 1.7% destroyed). Median building 654 pixels. First git commit.</p><pre class="cmd">python -m jupyter nbconvert --to notebook --execute --inplace 01_explore_xbd.ipynb</pre></li><li><div class="t-head"><span class="t-date">18 Oct</span><h3>Converted the data for training</h3></div><p>Measured file sizes (PNG 1.8 MB, JPEG-95 0.39 MB per image), wrote <code>src/preprocess.py</code>, checked one mask by overlaying it on its image, and converted all four splits.</p><pre class="cmd">python -m src.preprocess</pre></li><li><div class="t-head"><span class="t-date">18 Oct</span><h3>Wrote the localization training and proved it learns</h3></div><p>Wrote <code>src/dataset.py</code> and <code>src/train.py</code>. A tiny test checked saving and resuming; an overfit test on 8 tiles raised F1 from 0.08 to 0.77, proving the code learns. (A Google Colab version was also prepared, then removed when you chose to train on the Mac.)</p></li><li><div class="t-head"><span class="t-date">18 Oct</span><h3>Fixed a training freeze</h3></div><p>The first speed test froze: OpenCV threads deadlocked inside the DataLoader's worker processes. <code>cv2.setNumThreads(0)</code> fixed it. Measured speed: 0.86 seconds per batch, about 5 minutes of training per epoch.</p></li><li><div class="t-head"><span class="t-date">18–19 Oct</span><h3>Trained the localization model overnight</h3></div><p>30 epochs at about 7 minutes each (including validation). The score jumped around early (0.78 at epoch 3, 0.49 at epoch 4) while the learning rate was high, then settled. Best: <b>F1 0.792 at epoch 27</b>.</p><pre class="cmd">nohup caffeinate -i python -m src.train --epochs 30 &gt; runs/loc_resnet34/train.log 2&gt;&amp;1 &amp;</pre></li><li><div class="t-head"><span class="t-date">18 Oct</span><h3>Wrote the damage model and found a bug</h3></div><p>Wrote <code>src/damage.py</code>. The overfit test showed it learns (score 0.14 → 0.54). The resume test crashed: numpy numbers in the checkpoint made <code>torch.load</code> refuse it. Fixed by converting metrics to plain floats.</p></li><li><div class="t-head"><span class="t-date">19 Oct</span><h3>Trained damage v1, chained automatically</h3></div><p>A small script, <code>runs/overnight.sh</code>, waited for the localization run to finish and then started the damage model. Best: <b>score 0.575 at epoch 26</b>, but minor damage F1 only 0.22.</p><pre class="cmd">python -m src.damage --epochs 30</pre></li><li><div class="t-head"><span class="t-date">19 Oct</span><h3>Built the map and found the coordinate error</h3></div><p>Wrote <code>src/predict.py</code> and <code>dashboard/index.html</code>. Placing buildings with the GeoTIFF tags put them tens of metres off; fitting an affine transform from the label coordinates fixed it. Exported 804 hurricane tiles and checked alignment with screenshots.</p><pre class="cmd">python -m src.predict</pre></li><li><div class="t-head"><span class="t-date">19–20 Oct</span><h3>Tried to fix minor damage: v2 failed</h3></div><p>Added tier3 (9,168 tiles) and doubled the minor weight (0.5, 1, 6, 3, 3), 25 epochs at about 20 minutes each. Minor improved (0.22 → 0.40) but major collapsed (0.59 → 0.08): <b>score 0.402</b>. Lesson: weights trade neighbouring classes off against each other.</p><pre class="cmd">python -m src.damage --out-dir runs/damage_v2 --train-splits tier1 tier3 --epochs 25 --class-weights 0.5 1 6 3 3</pre></li><li><div class="t-head"><span class="t-date">20 Oct</span><h3>v3: balanced weights, fine-tuned from v1</h3></div><p>Started from v1's trained weights, equal weights for minor and major (4, 4), learning rate 0.0001, 10 epochs, 3.3 hours. <b>Score 0.711</b>, with minor 0.45, major 0.69, destroyed 0.80.</p><pre class="cmd">python -m src.damage --out-dir runs/damage_v3 --train-splits tier1 tier3 --epochs 10 --lr 1e-4 --init-from runs/damage_resnet34/best.pt --class-weights 0.5 1 4 4 3</pre></li><li><div class="t-head"><span class="t-date">19–21 Oct</span><h3>Wrote the report and slides</h3></div><p><code>docs/build_report.py</code> builds the Word report from the results and code, so numbers never need copying by hand. The presentation was built as a slide deck.</p><pre class="cmd">python docs/build_report.py</pre></li><li><div class="t-head"><span class="t-date">21 Oct</span><h3>Final evaluation on the test split</h3></div><p>Ran once at the end: localization F1 <b>0.788</b>, v1 score 0.584, v3 score <b>0.702</b>, 80.8% of buildings at the right level. Every number within about 0.01 of validation.</p><pre class="cmd">python -m src.evaluate</pre></li><li><div class="t-head"><span class="t-date">21 Oct</span><h3>Pushed to GitHub</h3></div><p>Merged GitHub's placeholder README and pushed everything except data and models.</p><pre class="cmd">git push -u origin main</pre></li><li><div class="t-head"><span class="t-date">21 Oct</span><h3>Checked the coordinate error everywhere</h3></div><p><code>src/check_georef.py</code> checked all 22,068 images: median offset 30 m, up to 84 m, growing with latitude. A side-by-side figure on an independent Esri basemap confirmed the labels are right.</p><pre class="cmd">python -m src.check_georef</pre></li><li><div class="t-head"><span class="t-date">21 Oct</span><h3>Started the OpenStreetMap validation</h3></div><p><code>src/validate_osm.py</code> compares xBD buildings with OSM buildings on 105 tiles across 7 disasters.</p><pre class="cmd">python -m src.validate_osm --per-disaster 15</pre></li></ol>
+</section>
+
+<section class="section" id="one-step">
+  <h2>One training step, traced</h2>
+  
+<p>What happens in one iteration of the localization model, with the actual shapes:</p>
+<ol>
+<li><b>Load.</b> The DataLoader asks the dataset for 8 random tiles. Each is cropped to 512 × 512, flipped or rotated at
+random, and normalised. Stacked together: images <code>(8, 3, 512, 512)</code>, masks <code>(8, 1, 512, 512)</code> of 0s and 1s.</li>
+<li><b>Move.</b> Both tensors are copied to the GPU (<code>.to("mps")</code>).</li>
+<li><b>Forward pass.</b> The encoder shrinks each crop through 5 levels down to 16 × 16 × 512 features; the decoder
+expands back to 512 × 512 using the skip connections. Output: logits <code>(8, 1, 512, 512)</code>, one score per pixel.</li>
+<li><b>Loss.</b> Binary cross-entropy compares all 2,097,152 pixel scores (8 × 512 × 512) with the mask; Dice compares
+predicted and true areas per image. Their sum is one number, for example 0.7.</li>
+<li><b>Backward pass.</b> <code>loss.backward()</code> computes a gradient for each of the 24,436,369 parameters.</li>
+<li><b>Update.</b> AdamW moves each parameter a tiny step (scaled by the learning rate, 0.0003) to lower the loss.</li>
+<li><b>Repeat.</b> 349 times is one epoch (about 5 minutes); then validation on 933 full tiles (about 1.5 minutes); then
+save checkpoints; then the next epoch, with a slightly lower learning rate.</li>
+</ol>
+<p>The damage model is the same except the input is <code>(8, 6, 512, 512)</code> (before and after stacked), the output is
+<code>(8, 5, 512, 512)</code> (five class scores per pixel), the target is <code>(8, 512, 512)</code> whole numbers 0–4 (or 255 to
+ignore), and the loss is weighted cross-entropy.</p>
+
+</section>
+
+<section class="section" id="code">
+  <h2>The code, file by file</h2>
+  <p>Each file’s code is shown in chunks, with the real line numbers on the left and an explanation on the right. The code is read from the project when this guide is built, so it is always current. Long chunks are folded; click to open them.</p>
+  <section class="file" id="src-xbd-py"><h3><code>src/xbd.py</code><span class="meta">137 lines</span></h3><p>The first file written. It knows how the raw xBD download is organised and how to read it: where the images and labels are, how a building outline is written, how to open the unusual 16-bit images, and how to draw a before/after pair. Every other file builds on it.</p><div class="chunk"><div class="chunk-code"><p class="where">lines 1–11</p><div class="code"><pre class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11</pre><pre class="src"><code class="language-python">&quot;&quot;&quot;Helpers for reading the xBD (xView2) building damage dataset.
+
+Expected layout after extracting the download:
+
+    data/xbd/tier1/images/hurricane-harvey_00000001_pre_disaster.tif   (.png in the smaller release)
+    data/xbd/tier1/images/hurricane-harvey_00000001_post_disaster.tif
+    data/xbd/tier1/labels/hurricane-harvey_00000001_post_disaster.json
+    ...
+
+The same layout repeats for tier3/, test/ and hold/.
+&quot;&quot;&quot;</code></pre></div></div><div class="chunk-text">
+<p>A <b>docstring</b>: a text block in triple quotes at the top of a file or function. Python ignores it
+when running; it is documentation for people. It shows the folder layout this file expects: for every tile
+there is a <code>pre</code> image, a <code>post</code> image and a <code>.json</code> label file.</p></div></div><div class="chunk"><div class="chunk-code"><p class="where">lines 13–22</p><div class="code"><pre class="ln" aria-hidden="true">13
+14
+15
+16
+17
+18
+19
+20
+21
+22</pre><pre class="src"><code class="language-python">import json
+import re
+from pathlib import Path
+
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+import tifffile
+from matplotlib.patches import Polygon as MplPolygon
+from PIL import Image</code></pre></div></div><div class="chunk-text">
+<p><b>Imports</b> load other people's code so we can use it.</p>
+<ul>
+<li><code>json</code> reads the label files, which are in JSON format (nested lists and dictionaries in text).</li>
+<li><code>re</code> is "regular expressions", a mini-language for finding patterns in text. Used to pull numbers out of polygon text.</li>
+<li><code>Path</code> handles file paths: <code>folder / "file.json"</code> joins them correctly on any computer.</li>
+<li><code>matplotlib</code> draws pictures; <code>numpy</code> (as <code>np</code>) does fast maths on arrays of numbers; <code>pandas</code> (as <code>pd</code>) handles tables.</li>
+<li><code>tifffile</code> reads TIFF images, including the 16-bit ones in xBD that Pillow (<code>PIL</code>) cannot open.</li>
+</ul></div></div><div class="chunk"><div class="chunk-code"><p class="where">lines 24–32</p><div class="code"><pre class="ln" aria-hidden="true">24
+25
+26
+27
+28
+29
+30
+31
+32</pre><pre class="src"><code class="language-python">DAMAGE_CLASSES = [&quot;no-damage&quot;, &quot;minor-damage&quot;, &quot;major-damage&quot;, &quot;destroyed&quot;, &quot;un-classified&quot;]
+
+DAMAGE_COLORS = {
+    &quot;no-damage&quot;: &quot;#2ca02c&quot;,
+    &quot;minor-damage&quot;: &quot;#f2c14e&quot;,
+    &quot;major-damage&quot;: &quot;#f28e2b&quot;,
+    &quot;destroyed&quot;: &quot;#d62728&quot;,
+    &quot;un-classified&quot;: &quot;#9e9e9e&quot;,
+}</code></pre></div></div><div class="chunk-text">
+<p><b>Constants</b>, written in capitals by convention: values that never change. The five label names used
+in xBD, and one colour per level (hex codes like <code>#d62728</code> = red), used in every picture in the project.</p></div></div><div class="chunk"><div class="chunk-code"><p class="where">line 34</p><div class="code"><pre class="ln" aria-hidden="true">34</pre><pre class="src"><code class="language-python">_NUM_PAIR = re.compile(r&quot;(-?\d+(?:\.\d+)?(?:[eE]-?\d+)?)\s+(-?\d+(?:\.\d+)?(?:[eE]-?\d+)?)&quot;)</code></pre></div></div><div class="chunk-text">
+<p>A compiled regular expression that matches <b>two numbers separated by a space</b>, such as
+<code>807.41 898.08</code>. Piece by piece: <code>-?</code> an optional minus sign, <code>\d+</code> one or more digits,
+<code>(?:\.\d+)?</code> an optional decimal part, <code>(?:[eE]-?\d+)?</code> optional scientific notation like
+<code>1e-5</code>, <code>\s+</code> spaces. The two round-bracket groups capture x and y. The leading underscore
+means "internal to this file".</p></div></div><div class="chunk"><div class="chunk-code"><p class="where">lines 37–41</p><div class="code"><pre class="ln" aria-hidden="true">37
+38
+39
+40
+41</pre><pre class="src"><code class="language-python">def parse_wkt_polygon(wkt):
+    &quot;&quot;&quot;Return the outer ring of a WKT POLYGON as an (N, 2) array of pixel x, y.&quot;&quot;&quot;
+    outer = wkt[wkt.index(&quot;((&quot;) + 2:]
+    outer = outer.split(&quot;)&quot;)[0]
+    return np.array([(float(x), float(y)) for x, y in _NUM_PAIR.findall(outer)])</code></pre></div></div><div class="chunk-text">
+<p>xBD writes each building outline as <b>WKT</b> ("well-known text"), for example
+<code>POLYGON ((807.4 898.1, 760.9 943.3, …))</code>. This function turns that text into a numpy array of shape
+<code>(N, 2)</code>: N corner points, each with an x and a y.</p>
+<ul>
+<li>Line 39 keeps everything after the first <code>((</code>.</li>
+<li>Line 40 keeps everything before the first <code>)</code>, i.e. only the outer ring (holes, if any, are ignored).</li>
+<li>Line 41 finds every number pair with the regex and converts the text to <code>float</code> numbers.</li>
+</ul>
+<p>The same function works for pixel outlines (<code>xy</code>) and map outlines (<code>lng_lat</code>), because both are WKT.</p></div></div><div class="chunk"><div class="chunk-code"><p class="where">lines 44–47</p><div class="code"><pre class="ln" aria-hidden="true">44
+45
+46
+47</pre><pre class="src"><code class="language-python">def polygon_area(points):
+    &quot;&quot;&quot;Shoelace formula, in square pixels.&quot;&quot;&quot;
+    x, y = points[:, 0], points[:, 1]
+    return 0.5 * abs(np.dot(x, np.roll(y, 1)) - np.dot(y, np.roll(x, 1)))</code></pre></div></div><div class="chunk-text">
+<p>The <b>shoelace formula</b> for the area of a polygon from its corners: multiply each x by the next y, subtract
+each y times the next x, add up, halve. <code>np.roll(y, 1)</code> shifts the array by one so "the next corner" lines
+up. Used in notebook 01 to measure building sizes (median 654 square pixels).</p></div></div><div class="chunk"><div class="chunk-code"><p class="where">lines 50–66</p><div class="code"><pre class="ln" aria-hidden="true">50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66</pre><pre class="src"><code class="language-python">def find_pairs(split_dir):
+    &quot;&quot;&quot;One row per tile: disaster name, tile id, and the pre/post image and label paths.&quot;&quot;&quot;
+    split_dir = Path(split_dir)
+    # The PNG release and the full GeoTIFF release differ only in image extension
+    ext = &quot;.tif&quot; if any((split_dir / &quot;images&quot;).glob(&quot;*.tif&quot;)) else &quot;.png&quot;
+    rows = []
+    for post_label in sorted((split_dir / &quot;labels&quot;).glob(&quot;*_post_disaster.json&quot;)):
+        tile_id = post_label.name.replace(&quot;_post_disaster.json&quot;, &quot;&quot;)
+        disaster = tile_id.rsplit(&quot;_&quot;, 1)[0]
+        rows.append({
+            &quot;tile_id&quot;: tile_id,
+            &quot;disaster&quot;: disaster,
+            &quot;pre_image&quot;: split_dir / &quot;images&quot; / f&quot;{tile_id}_pre_disaster{ext}&quot;,
+            &quot;post_image&quot;: split_dir / &quot;images&quot; / f&quot;{tile_id}_post_disaster{ext}&quot;,
+            &quot;post_label&quot;: post_label,
+        })
+    return pd.DataFrame(rows)</code></pre></div></div><div class="chunk-text">
+<p>Lists every tile in a split folder (for example <code>data/xbd/tier1</code>) as one row of a table.</p>
+<ul>
+<li>Line 54 checks whether the images are <code>.tif</code> (the full release you downloaded) or <code>.png</code> (a smaller release). Added after the first version only looked for <code>.png</code>.</li>
+<li>Line 56 finds every <code>*_post_disaster.json</code> label. <code>sorted</code> gives a fixed order, so runs are repeatable.</li>
+<li>Line 57 cuts the tile id out of the file name, e.g. <code>hurricane-harvey_00000137</code>.</li>
+<li>Line 58: <code>rsplit("_", 1)</code> splits at the last underscore, so the disaster is <code>hurricane-harvey</code>.</li>
+<li>Lines 59–65 build a dictionary with the paths of the pre image, post image and label; line 66 turns the list into a pandas table.</li>
+</ul></div></div><div class="chunk"><div class="chunk-code"><p class="where">lines 69–77</p><div class="code"><pre class="ln" aria-hidden="true">69
+70
+71
+72
+73
+74
+75
+76
+77</pre><pre class="src"><code class="language-python">def load_image(path):
+    &quot;&quot;&quot;RGB image as a (H, W, 3) uint8 array.
+
+    The GeoTIFF release stores pixels as int16 that already lie in 0-255, which Pillow cannot open.
+    &quot;&quot;&quot;
+    path = Path(path)
+    if path.suffix.lower() in (&quot;.tif&quot;, &quot;.tiff&quot;):
+        return np.clip(tifffile.imread(path), 0, 255).astype(np.uint8)
+    return np.array(Image.open(path).convert(&quot;RGB&quot;))</code></pre></div></div><div class="chunk-text">
+<p>The fix for the first real problem in the project. The GeoTIFF images store each colour value as a
+<b>16-bit signed integer</b> (<code>int16</code>), although the values only go from 0 to 255. Pillow cannot open
+3-channel 16-bit images, so:</p>
+<ul>
+<li>for <code>.tif</code>: read with <code>tifffile</code>, <code>np.clip</code> forces values into 0–255, and <code>astype(np.uint8)</code> converts to normal 8-bit colour;</li>
+<li>for anything else: open with Pillow and force RGB.</li>
+</ul>
+<p>The result is always an array of shape <code>(1024, 1024, 3)</code>: height, width, and three colour channels (red, green, blue).</p></div></div><div class="chunk"><div class="chunk-code"><p class="where">lines 80–94</p><div class="code"><pre class="ln" aria-hidden="true">80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94</pre><pre class="src"><code class="language-python">def load_buildings(label_path):
+    &quot;&quot;&quot;Buildings in a post-disaster label file, each with its damage level and outline.&quot;&quot;&quot;
+    with open(label_path) as f:
+        label = json.load(f)
+    buildings = []
+    for feature in label[&quot;features&quot;][&quot;xy&quot;]:
+        props = feature[&quot;properties&quot;]
+        if props.get(&quot;feature_type&quot;, &quot;building&quot;) != &quot;building&quot;:
+            continue
+        buildings.append({
+            &quot;uid&quot;: props.get(&quot;uid&quot;),
+            &quot;damage&quot;: props.get(&quot;subtype&quot;, &quot;un-classified&quot;),
+            &quot;polygon&quot;: parse_wkt_polygon(feature[&quot;wkt&quot;]),
+        })
+    return buildings</code></pre></div></div><div class="chunk-text">
+<p>Opens a label file and returns its buildings. In the JSON, <code>features["xy"]</code> holds outlines in
+pixel coordinates, and each has <code>properties</code> such as <code>subtype</code> (the damage level) and
+<code>uid</code> (a unique id). Non-buildings are skipped (line 87). If a building has no <code>subtype</code>
+(pre-disaster labels have none), it is treated as <code>"un-classified"</code>.</p></div></div><div class="chunk"><div class="chunk-code"><p class="where">lines 97–99</p><div class="code"><pre class="ln" aria-hidden="true">97
+98
+99</pre><pre class="src"><code class="language-python">def load_metadata(label_path):
+    with open(label_path) as f:
+        return json.load(f).get(&quot;metadata&quot;, {})</code></pre></div></div><div class="chunk-text">
+<p>Returns the <code>metadata</code> block of a label file: satellite name, capture date, off-nadir angle (how
+slanted the photo was), pixel size, and so on. Shown once in notebook 01.</p></div></div><div class="chunk"><div class="chunk-code"><p class="where">lines 102–114</p><div class="code"><pre class="ln" aria-hidden="true">102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114</pre><pre class="src"><code class="language-python">def building_table(pairs):
+    &quot;&quot;&quot;One row per building across all tiles, for counting and plotting.&quot;&quot;&quot;
+    rows = []
+    for pair in pairs.itertuples():
+        for b in load_buildings(pair.post_label):
+            rows.append({
+                &quot;tile_id&quot;: pair.tile_id,
+                &quot;disaster&quot;: pair.disaster,
+                &quot;uid&quot;: b[&quot;uid&quot;],
+                &quot;damage&quot;: b[&quot;damage&quot;],
+                &quot;area_px&quot;: polygon_area(b[&quot;polygon&quot;]),
+            })
+    return pd.DataFrame(rows)</code></pre></div></div><div class="chunk-text">
+<p>Loops over all tiles and all buildings and makes one big table with one row per building: tile, disaster,
+damage level and area. This is what notebook 01 counts to get "162,787 buildings, 72% undamaged".
+<code>itertuples()</code> walks through a pandas table row by row.</p></div></div><div class="chunk"><div class="chunk-code"><p class="where">lines 117–137</p><div class="code"><pre class="ln" aria-hidden="true">117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137</pre><pre class="src"><code class="language-python">def show_pair(pair, figsize=(14, 7)):
+    &quot;&quot;&quot;Pre-disaster image next to the post-disaster image with damage-colored outlines.&quot;&quot;&quot;
+    fig, (ax_pre, ax_post) = plt.subplots(1, 2, figsize=figsize)
+    ax_pre.imshow(load_image(pair[&quot;pre_image&quot;]))
+    ax_post.imshow(load_image(pair[&quot;post_image&quot;]))
+
+    counts = {}
+    for b in load_buildings(pair[&quot;post_label&quot;]):
+        color = DAMAGE_COLORS.get(b[&quot;damage&quot;], &quot;#9e9e9e&quot;)
+        ax_post.add_patch(MplPolygon(b[&quot;polygon&quot;], closed=True, fill=False, edgecolor=color, linewidth=1.2))
+        counts[b[&quot;damage&quot;]] = counts.get(b[&quot;damage&quot;], 0) + 1
+
+    ax_pre.set_title(f&quot;{pair[&#x27;tile_id&#x27;]} — before&quot;)
+    ax_post.set_title(&quot;after: &quot; + &quot;, &quot;.join(f&quot;{k} {v}&quot; for k, v in sorted(counts.items())))
+    for ax in (ax_pre, ax_post):
+        ax.axis(&quot;off&quot;)
+
+    handles = [plt.Line2D([], [], color=c, linewidth=3, label=k) for k, c in DAMAGE_COLORS.items()]
+    fig.legend(handles=handles, loc=&quot;lower center&quot;, ncol=len(handles), frameon=False)
+    fig.tight_layout(rect=(0, 0.05, 1, 1))
+    return fig</code></pre></div></div><div class="chunk-text">
+<p>Draws a tile before and after, side by side, with every building outlined in its damage colour.</p>
+<ul>
+<li><code>plt.subplots(1, 2)</code> makes a figure with two panels.</li>
+<li><code>imshow</code> draws an image; <code>MplPolygon</code> draws an outline; <code>add_patch</code> puts it on the panel.</li>
+<li>Lines 123–127 also count buildings per level for the title.</li>
+<li>Lines 134–136 add a colour legend at the bottom.</li>
+</ul></div></div></section><section class="file" id="src-preprocess-py"><h3><code>src/preprocess.py</code><span class="meta">75 lines</span></h3><p>Runs once, before any training. It converts the 130 GB of slow 16-bit GeoTIFFs into about 9 GB of JPEG images plus one <b>mask</b> per tile, a greyscale image where each pixel's number says what is there. Training then reads these small, fast files thousands of times.</p><div class="chunk"><div class="chunk-code"><p class="where">lines 1–13</p><div class="code"><pre class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13</pre><pre class="src"><code class="language-python">&quot;&quot;&quot;Convert raw xBD into a compact training format that loads much faster than the 16-bit GeoTIFFs.
+
+For every tile it writes:
+
+    data/processed/&lt;split&gt;/images/&lt;tile_id&gt;_pre.jpg    before image, JPEG quality 95
+    data/processed/&lt;split&gt;/images/&lt;tile_id&gt;_post.jpg   after image
+    data/processed/&lt;split&gt;/masks/&lt;tile_id&gt;.png         one value per pixel, see MASK_VALUES
+
+Usage (from the project root):
+
+    /opt/anaconda3/bin/python3 -m src.preprocess              # all splits
+    /opt/anaconda3/bin/python3 -m src.preprocess tier1 hold   # only these
+&quot;&quot;&quot;</code></pre></div></div><div class="chunk-text"><p>Docstring with the output layout and the two ways to run it: all splits, or only the ones you name.</p></div></div><div class="chunk"><div class="chunk-code"><p class="where">lines 15–22</p><div class="code"><pre class="ln" aria-hidden="true">15
+16
+17
+18
+19
+20
+21
+22</pre><pre class="src"><code class="language-python">import sys
+from multiprocessing import Pool
+from pathlib import Path
+
+import cv2
+import numpy as np
+
+from src.xbd import find_pairs, load_buildings, load_image</code></pre></div></div><div class="chunk-text">
+<p><code>sys</code> gives access to the command-line arguments. <code>multiprocessing.Pool</code> runs work on
+several CPU cores at once (your M1 Pro has 10). <code>cv2</code> is OpenCV, a fast image library used to write
+JPEGs and draw filled polygons. The last line imports three helpers from <code>xbd.py</code>.</p></div></div><div class="chunk"><div class="chunk-code"><p class="where">lines 24–27</p><div class="code"><pre class="ln" aria-hidden="true">24
+25
+26
+27</pre><pre class="src"><code class="language-python">RAW_ROOT = Path(&quot;data/xbd&quot;)
+OUT_ROOT = Path(&quot;data/processed&quot;)
+SPLITS = [&quot;tier1&quot;, &quot;tier3&quot;, &quot;hold&quot;, &quot;test&quot;]
+JPEG_QUALITY = 95</code></pre></div></div><div class="chunk-text">
+<p>Settings: where raw data is, where to write, which splits exist, and the JPEG quality. Quality 95 was chosen
+after a measurement: a PNG would be 1.8 MB per image (40 GB in total), JPEG 95 is 0.39 MB (8.6 GB), and
+changes pixel values by only 1.46 out of 255 on average, which is invisible.</p></div></div><div class="chunk"><div class="chunk-code"><p class="where">lines 29–36</p><div class="code"><pre class="ln" aria-hidden="true">29
+30
+31
+32
+33
+34
+35
+36</pre><pre class="src"><code class="language-python"># Pixel values in the mask. 0 is background; anything above 0 is a building.
+MASK_VALUES = {
+    &quot;no-damage&quot;: 1,
+    &quot;minor-damage&quot;: 2,
+    &quot;major-damage&quot;: 3,
+    &quot;destroyed&quot;: 4,
+    &quot;un-classified&quot;: 5,
+}</code></pre></div></div><div class="chunk-text">
+<p>The <b>mask encoding</b>: in each mask image, background pixels are 0 and building pixels hold the damage level,
+1 to 4, or 5 for un-classified buildings. One mask therefore serves both models: the localization model only
+asks "is it above 0?", the damage model uses the exact value.</p></div></div><div class="chunk"><div class="chunk-code"><p class="where">lines 39–44</p><div class="code"><pre class="ln" aria-hidden="true">39
+40
+41
+42
+43
+44</pre><pre class="src"><code class="language-python">def make_mask(label_path, height=1024, width=1024):
+    mask = np.zeros((height, width), dtype=np.uint8)
+    for b in load_buildings(label_path):
+        points = np.round(b[&quot;polygon&quot;]).astype(np.int32)
+        cv2.fillPoly(mask, [points], MASK_VALUES.get(b[&quot;damage&quot;], 5))
+    return mask</code></pre></div></div><div class="chunk-text">
+<p>Builds a mask for one tile.</p>
+<ul>
+<li>Line 40: start with a 1024 × 1024 array of zeros (all background). <code>uint8</code> = whole numbers 0–255, one byte each.</li>
+<li>Line 42: polygon corners are decimal numbers; <code>np.round(...).astype(np.int32)</code> turns them into whole pixel positions, which OpenCV needs.</li>
+<li>Line 43: <code>cv2.fillPoly</code> paints the inside of the polygon with the building's damage value.</li>
+</ul></div></div><div class="chunk"><div class="chunk-code"><p class="where">lines 47–57</p><div class="code"><pre class="ln" aria-hidden="true">47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57</pre><pre class="src"><code class="language-python">def process_tile(args):
+    pair, out_dir = args
+    tile_id = pair[&quot;tile_id&quot;]
+    for phase in (&quot;pre&quot;, &quot;post&quot;):
+        out = out_dir / &quot;images&quot; / f&quot;{tile_id}_{phase}.jpg&quot;
+        if not out.exists():
+            rgb = load_image(pair[f&quot;{phase}_image&quot;])
+            cv2.imwrite(str(out), cv2.cvtColor(rgb, cv2.COLOR_RGB2BGR), [cv2.IMWRITE_JPEG_QUALITY, JPEG_QUALITY])
+    mask_out = out_dir / &quot;masks&quot; / f&quot;{tile_id}.png&quot;
+    if not mask_out.exists():
+        cv2.imwrite(str(mask_out), make_mask(pair[&quot;post_label&quot;]))</code></pre></div></div><div class="chunk-text">
+<p>Converts one tile. For <code>pre</code> and <code>post</code>: read the TIFF with <code>load_image</code>, convert
+the colour order with <code>cv2.cvtColor</code> (OpenCV stores colours as blue-green-red, the rest of Python uses
+red-green-blue), and save as JPEG. Then make and save the mask as PNG (lossless, so the numbers stay exact).
+The <code>if not ... exists()</code> checks skip finished files, so the script can be stopped and restarted.</p></div></div><div class="chunk"><div class="chunk-code"><p class="where">lines 60–70</p><div class="code"><pre class="ln" aria-hidden="true">60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70</pre><pre class="src"><code class="language-python">def process_split(split):
+    pairs = find_pairs(RAW_ROOT / split)
+    out_dir = OUT_ROOT / split
+    (out_dir / &quot;images&quot;).mkdir(parents=True, exist_ok=True)
+    (out_dir / &quot;masks&quot;).mkdir(parents=True, exist_ok=True)
+
+    jobs = [(row, out_dir) for row in pairs.to_dict(&quot;records&quot;)]
+    with Pool() as pool:
+        for i, _ in enumerate(pool.imap_unordered(process_tile, jobs, chunksize=8), 1):
+            if i % 500 == 0 or i == len(jobs):
+                print(f&quot;{split}: {i}/{len(jobs)} tiles&quot;, flush=True)</code></pre></div></div><div class="chunk-text">
+<p>Converts a whole split in parallel.</p>
+<ul>
+<li>Lines 63–64 create the output folders (<code>parents=True</code> creates missing parent folders, <code>exist_ok=True</code> means "no error if it already exists").</li>
+<li>Line 66 turns the table into a list of jobs, one per tile.</li>
+<li>Line 67: <code>with Pool() as pool</code> starts one worker process per CPU core.</li>
+<li>Line 68: <code>imap_unordered</code> hands the jobs out, 8 at a time (<code>chunksize</code>), and yields as each finishes; <code>enumerate(..., 1)</code> counts from 1 for the progress message.</li>
+</ul>
+<p>This converted the 933 <code>hold</code> tiles in 23 seconds.</p></div></div><div class="chunk"><div class="chunk-code"><p class="where">lines 73–75</p><div class="code"><pre class="ln" aria-hidden="true">73
+74
+75</pre><pre class="src"><code class="language-python">if __name__ == &quot;__main__&quot;:
+    for split in sys.argv[1:] or SPLITS:
+        process_split(split)</code></pre></div></div><div class="chunk-text">
+<p>This block runs only when the file is started as a program (<code>python -m src.preprocess</code>), not when
+another file imports it. <code>sys.argv[1:]</code> is the list of words typed after the command;
+<code>or SPLITS</code> means "if none were typed, do all four".</p></div></div></section><section class="file" id="src-dataset-py"><h3><code>src/dataset.py</code><span class="meta">70 lines</span></h3><p>Feeds training examples to the localization model. PyTorch expects a <b>Dataset</b>: an object that says how many examples there are and returns example number <i>i</i> on request. PyTorch's <b>DataLoader</b> then asks for examples in random order, groups them into batches and does it in background processes.</p><div class="chunk"><div class="chunk-code"><p class="where">line 1</p><div class="code"><pre class="ln" aria-hidden="true">1</pre><pre class="src"><code class="language-python">&quot;&quot;&quot;PyTorch dataset over the processed xBD files written by src/preprocess.py.&quot;&quot;&quot;</code></pre></div></div><div class="chunk-text"><p>One-line docstring.</p></div></div><div class="chunk"><div class="chunk-code"><p class="where">lines 3–8</p><div class="code"><pre class="ln" aria-hidden="true">3
+4
+5
+6
+7
+8</pre><pre class="src"><code class="language-python">from pathlib import Path
+
+import cv2
+import numpy as np
+import torch
+from torch.utils.data import Dataset</code></pre></div></div><div class="chunk-text"><p><code>torch</code> is PyTorch, the deep-learning library. <code>Dataset</code> is the base class our dataset extends.</p></div></div><div class="chunk"><div class="chunk-code"><p class="where">lines 10–11</p><div class="code"><pre class="ln" aria-hidden="true">10
+11</pre><pre class="src"><code class="language-python"># OpenCV&#x27;s own thread pool can deadlock inside DataLoader worker processes
+cv2.setNumThreads(0)</code></pre></div></div><div class="chunk-text">
+<p>One line that fixed a real bug. During the first speed test, training froze completely. PyTorch's DataLoader
+starts helper processes to load images; OpenCV inside each of them started its own thread pool, and on macOS
+this can <b>deadlock</b> (threads waiting for each other forever). <code>setNumThreads(0)</code> turns OpenCV's
+threading off; the parallelism comes from the DataLoader's processes instead. After this line, the helpers
+started in 8 seconds and training ran at full speed.</p></div></div><div class="chunk"><div class="chunk-code"><p class="where">lines 13–14</p><div class="code"><pre class="ln" aria-hidden="true">13
+14</pre><pre class="src"><code class="language-python">IMAGENET_MEAN = np.array([0.485, 0.456, 0.406], dtype=np.float32)
+IMAGENET_STD = np.array([0.229, 0.224, 0.225], dtype=np.float32)</code></pre></div></div><div class="chunk-text">
+<p>The average and spread of red, green and blue over the 1.2 million ImageNet photos the encoder was pretrained
+on. Our images are normalised with the same numbers, so the pretrained network sees inputs in the range it is
+used to.</p></div></div><div class="chunk"><div class="chunk-code"><p class="where">lines 17–18</p><div class="code"><pre class="ln" aria-hidden="true">17
+18</pre><pre class="src"><code class="language-python">def read_rgb(path):
+    return cv2.cvtColor(cv2.imread(str(path)), cv2.COLOR_BGR2RGB)</code></pre></div></div><div class="chunk-text"><p>Reads a JPEG with OpenCV and converts blue-green-red to red-green-blue.</p></div></div><div class="chunk"><div class="chunk-code"><p class="where">lines 21–24</p><div class="code"><pre class="ln" aria-hidden="true">21
+22
+23
+24</pre><pre class="src"><code class="language-python">def to_tensor(rgb):
+    &quot;&quot;&quot;uint8 (H, W, 3) -&gt; normalized float tensor (3, H, W), as the pretrained encoder expects.&quot;&quot;&quot;
+    x = (rgb.astype(np.float32) / 255.0 - IMAGENET_MEAN) / IMAGENET_STD
+    return torch.from_numpy(x.transpose(2, 0, 1).copy())</code></pre></div></div><div class="chunk-text">
+<p>Turns an image into what the network wants:</p>
+<ul>
+<li><code>/ 255.0</code>: pixel values 0–255 become 0–1;</li>
+<li><code>- MEAN) / STD</code>: subtract the ImageNet average and divide by the spread, so values are centred around 0;</li>
+<li><code>transpose(2, 0, 1)</code>: from (height, width, channels) to (channels, height, width), PyTorch's order;</li>
+<li><code>torch.from_numpy</code>: wraps the numpy array as a PyTorch <b>tensor</b> (a multi-dimensional array that can live on the GPU and track gradients). <code>.copy()</code> makes the memory contiguous, which PyTorch requires after a transpose.</li>
+</ul></div></div><div class="chunk"><div class="chunk-code"><p class="where">lines 27–42</p><div class="code"><pre class="ln" aria-hidden="true">27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42</pre><pre class="src"><code class="language-python">class BuildingDataset(Dataset):
+    &quot;&quot;&quot;Pre-disaster image -&gt; building / background mask, for the localization model.
+
+    split_dirs: one or more folders like data/processed/tier1
+    crop:       random square crop size for training; None returns the full 1024x1024 tile
+    augment:    random flips and 90-degree rotations
+    &quot;&quot;&quot;
+
+    def __init__(self, split_dirs, crop=512, augment=True, max_tiles=None):
+        self.mask_paths = []
+        for d in split_dirs:
+            self.mask_paths += sorted(Path(d, &quot;masks&quot;).glob(&quot;*.png&quot;))
+        if max_tiles:
+            self.mask_paths = self.mask_paths[:max_tiles]
+        self.crop = crop
+        self.augment = augment</code></pre></div></div><div class="chunk-text">
+<p>The dataset class and its constructor (<code>__init__</code>, run once when the object is created). It collects
+the paths of all mask files in the given split folders. <code>max_tiles</code> is used only for small tests
+(for example 8 tiles). <code>crop</code> and <code>augment</code> are stored for later.</p></div></div><div class="chunk"><div class="chunk-code"><p class="where">lines 44–45</p><div class="code"><pre class="ln" aria-hidden="true">44
+45</pre><pre class="src"><code class="language-python">    def __len__(self):
+        return len(self.mask_paths)</code></pre></div></div><div class="chunk-text"><p>Tells PyTorch how many examples exist (2,799 for tier1). Needed so it can shuffle and count batches.</p></div></div><div class="chunk"><div class="chunk-code"><p class="where">lines 47–49</p><div class="code"><pre class="ln" aria-hidden="true">47
+48
+49</pre><pre class="src"><code class="language-python">    def image_path(self, i):
+        mask_path = self.mask_paths[i]
+        return mask_path.parent.parent / &quot;images&quot; / f&quot;{mask_path.stem}_pre.jpg&quot;</code></pre></div></div><div class="chunk-text"><p>From a mask path like <code>.../masks/hurricane-harvey_00000137.png</code>, builds the matching image path <code>.../images/hurricane-harvey_00000137_pre.jpg</code>. <code>parent.parent</code> goes up two folders; <code>stem</code> is the file name without extension.</p></div></div><div class="chunk"><div class="chunk-code"><p class="where">lines 51–53</p><div class="code"><pre class="ln" aria-hidden="true">51
+52
+53</pre><pre class="src"><code class="language-python">    def __getitem__(self, i):
+        image = read_rgb(self.image_path(i))
+        mask = (cv2.imread(str(self.mask_paths[i]), cv2.IMREAD_GRAYSCALE) &gt; 0).astype(np.float32)</code></pre></div></div><div class="chunk-text">
+<p>Returns example number <code>i</code>. This runs about 2,800 times per epoch, inside the DataLoader's helper
+processes. Line 52 reads the before image; line 53 reads the mask and turns it into <b>0/1</b>: <code>&gt; 0</code>
+gives True for every building pixel whatever its damage level, and <code>astype(np.float32)</code> turns
+True/False into 1.0/0.0.</p></div></div><div class="chunk"><div class="chunk-code"><p class="where">lines 55–60</p><div class="code"><pre class="ln" aria-hidden="true">55
+56
+57
+58
+59
+60</pre><pre class="src"><code class="language-python">        if self.crop:
+            h, w = mask.shape
+            y = np.random.randint(0, h - self.crop + 1)
+            x = np.random.randint(0, w - self.crop + 1)
+            image = image[y:y + self.crop, x:x + self.crop]
+            mask = mask[y:y + self.crop, x:x + self.crop]</code></pre></div></div><div class="chunk-text">
+<p><b>Random crop.</b> Pick a random top-left corner (<code>y</code>, <code>x</code>) and cut a 512 × 512 square from
+the 1024 × 1024 tile, the same square from image and mask. Each epoch therefore sees a different quarter of each
+tile, and four times smaller inputs fit in memory with a batch of 8.</p></div></div><div class="chunk"><div class="chunk-code"><p class="where">lines 62–68</p><div class="code"><pre class="ln" aria-hidden="true">62
+63
+64
+65
+66
+67
+68</pre><pre class="src"><code class="language-python">        if self.augment:
+            if np.random.rand() &lt; 0.5:
+                image, mask = image[:, ::-1], mask[:, ::-1]
+            if np.random.rand() &lt; 0.5:
+                image, mask = image[::-1], mask[::-1]
+            k = np.random.randint(4)
+            image, mask = np.rot90(image, k), np.rot90(mask, k)</code></pre></div></div><div class="chunk-text">
+<p><b>Augmentation</b>: random changes that create variety for free. A roof seen from above is equally valid
+mirrored or rotated, so:</p>
+<ul>
+<li>50% chance: flip left–right (<code>[:, ::-1]</code> reverses the column order);</li>
+<li>50% chance: flip upside down (<code>[::-1]</code> reverses the row order);</li>
+<li>rotate by 0, 90, 180 or 270 degrees (<code>np.rot90(..., k)</code>).</li>
+</ul>
+<p>Image and mask always get the same change, so they stay aligned.</p></div></div><div class="chunk"><div class="chunk-code"><p class="where">line 70</p><div class="code"><pre class="ln" aria-hidden="true">70</pre><pre class="src"><code class="language-python">        return to_tensor(image), torch.from_numpy(mask.copy())[None]</code></pre></div></div><div class="chunk-text">
+<p>Returns the pair (input, answer). The mask becomes a tensor and <code>[None]</code> adds a channel dimension:
+shape <code>(1, 512, 512)</code>, matching the model's single output channel.</p></div></div></section><section class="file" id="src-train-py"><h3><code>src/train.py</code><span class="meta">170 lines</span></h3><p>Builds, trains and scores the first model, which finds buildings. Read the section <a href="#one-step">One training step, traced</a> alongside this file.</p><div class="chunk"><div class="chunk-code"><p class="where">lines 1–12</p><div class="code"><pre class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12</pre><pre class="src"><code class="language-python">&quot;&quot;&quot;Training and evaluation for the building localization model (phase 2).
+
+Model: U-Net with an ImageNet-pretrained ResNet-34 encoder, predicting one channel
+(building vs background) from the pre-disaster image.
+
+Metric: pixel F1 over the whole validation set, the same localization score the
+xView2 challenge used.
+
+Usage (from the project root; rerunning the same command resumes from the last epoch):
+
+    /opt/anaconda3/bin/python3 -m src.train --epochs 30
+&quot;&quot;&quot;</code></pre></div></div><div class="chunk-text"><p>Docstring: what the model is, how it is scored, and the command that runs it.</p></div></div><div class="chunk"><div class="chunk-code"><p class="where">lines 14–23</p><div class="code"><pre class="ln" aria-hidden="true">14
+15
+16
+17
+18
+19
+20
+21
+22
+23</pre><pre class="src"><code class="language-python">import csv
+import time
+from pathlib import Path
+
+import segmentation_models_pytorch as smp
+import torch
+import torch.nn.functional as F
+from torch.utils.data import DataLoader
+
+from src.dataset import BuildingDataset</code></pre></div></div><div class="chunk-text">
+<p><code>segmentation_models_pytorch</code> (imported as <code>smp</code>) is a library of ready-made segmentation
+networks: it saved writing a U-Net by hand. <code>torch.nn.functional</code> (as <code>F</code>) holds loss functions.
+<code>DataLoader</code> batches examples. The last line imports our dataset.</p></div></div><div class="chunk"><div class="chunk-code"><p class="where">lines 26–27</p><div class="code"><pre class="ln" aria-hidden="true">26
+27</pre><pre class="src"><code class="language-python">def build_model(pretrained=True):
+    return smp.Unet(&quot;resnet34&quot;, encoder_weights=&quot;imagenet&quot; if pretrained else None, in_channels=3, classes=1)</code></pre></div></div><div class="chunk-text">
+<p>The whole model in one line: a <b>U-Net</b> whose encoder is a <b>ResNet-34</b> with weights pretrained on
+ImageNet, taking 3 input channels (RGB) and producing 1 output channel (building score per pixel). It has
+24,436,369 adjustable numbers (<b>parameters</b>), 21.3 million of them in the encoder. With
+<code>pretrained=False</code> the architecture is built without downloading weights; that is used when loading our
+own trained weights afterwards.</p></div></div><div class="chunk"><div class="chunk-code"><p class="where">lines 30–35</p><div class="code"><pre class="ln" aria-hidden="true">30
+31
+32
+33
+34
+35</pre><pre class="src"><code class="language-python">def pick_device():
+    if torch.cuda.is_available():
+        return torch.device(&quot;cuda&quot;)
+    if torch.backends.mps.is_available():
+        return torch.device(&quot;mps&quot;)
+    return torch.device(&quot;cpu&quot;)</code></pre></div></div><div class="chunk-text">
+<p>Chooses where the maths runs: an NVIDIA GPU (<code>cuda</code>) if present, else the Apple Silicon GPU
+(<code>mps</code>, Metal Performance Shaders), else the CPU. On your Mac it returns <code>mps</code>.</p></div></div><div class="chunk"><div class="chunk-code"><p class="where">lines 38–42</p><div class="code"><pre class="ln" aria-hidden="true">38
+39
+40
+41
+42</pre><pre class="src"><code class="language-python">def dice_loss(logits, target, eps=1.0):
+    prob = torch.sigmoid(logits)
+    inter = (prob * target).sum(dim=(1, 2, 3))
+    union = prob.sum(dim=(1, 2, 3)) + target.sum(dim=(1, 2, 3))
+    return (1 - (2 * inter + eps) / (union + eps)).mean()</code></pre></div></div><div class="chunk-text">
+<p><b>Dice loss</b> measures overlap between predicted and true building areas.</p>
+<ul>
+<li><code>sigmoid</code> turns raw scores (<b>logits</b>, any number) into probabilities 0–1.</li>
+<li><code>inter</code>: sum of probability × truth = the "overlap"; <code>union</code>: total predicted + total true.</li>
+<li><code>sum(dim=(1, 2, 3))</code> adds over channel, height and width, giving one number per image in the batch.</li>
+<li>Dice = 2 × overlap / (predicted + true): 1 for perfect overlap. The loss is 1 − Dice, so smaller is better. <code>eps</code> avoids dividing by zero on crops without buildings.</li>
+</ul></div></div><div class="chunk"><div class="chunk-code"><p class="where">lines 45–47</p><div class="code"><pre class="ln" aria-hidden="true">45
+46
+47</pre><pre class="src"><code class="language-python">def loss_fn(logits, target):
+    # BCE learns per-pixel, Dice keeps small buildings from being ignored next to all the background
+    return F.binary_cross_entropy_with_logits(logits, target) + dice_loss(logits, target)</code></pre></div></div><div class="chunk-text">
+<p>The training loss is the sum of two parts. <b>Binary cross-entropy</b> scores every pixel on its own: it is
+large when the model is confident and wrong. Because about 85% of pixels are background, it alone would let the
+model under-predict small buildings; <b>Dice</b> compensates because it is a ratio of areas, not a count of pixels.</p></div></div><div class="chunk"><div class="chunk-code"><p class="where">lines 50–63</p><div class="code"><pre class="ln" aria-hidden="true">50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63</pre><pre class="src"><code class="language-python">@torch.no_grad()
+def evaluate(model, loader, device, threshold=0.5):
+    model.eval()
+    tp = fp = fn = 0
+    for images, masks in loader:
+        pred = torch.sigmoid(model(images.to(device))) &gt; threshold
+        masks = masks.to(device) &gt; 0.5
+        tp += (pred &amp; masks).sum().item()
+        fp += (pred &amp; ~masks).sum().item()
+        fn += (~pred &amp; masks).sum().item()
+    precision = tp / max(tp + fp, 1)
+    recall = tp / max(tp + fn, 1)
+    f1 = 2 * precision * recall / max(precision + recall, 1e-9)
+    return {&quot;f1&quot;: f1, &quot;precision&quot;: precision, &quot;recall&quot;: recall}</code></pre></div></div><div class="chunk-text">
+<p>Scores the model on the validation split.</p>
+<ul>
+<li><code>@torch.no_grad()</code> tells PyTorch not to record gradients: faster and uses less memory, since we are not learning here.</li>
+<li><code>model.eval()</code> switches layers such as batch normalisation to their fixed, test-time behaviour.</li>
+<li>For each batch: probability above 0.5 means "building". Compare with the truth and count <b>true positives</b> (both say building), <b>false positives</b> (model says building, truth says no) and <b>false negatives</b> (missed buildings). <code>&amp;</code> is "and", <code>~</code> is "not"; <code>.item()</code> turns a one-number tensor into a Python number.</li>
+<li>After all batches: precision, recall and F1, computed once over all pixels of all tiles, as the xView2 challenge does. <code>max(..., 1)</code> avoids dividing by zero.</li>
+</ul></div></div><div class="chunk"><div class="chunk-code"><p class="where">lines 66–84</p><div class="code"><pre class="ln" aria-hidden="true">66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84</pre><pre class="src"><code class="language-python">def train_localization(
+    data_root,
+    out_dir,
+    train_splits=(&quot;tier1&quot;,),
+    val_split=&quot;hold&quot;,
+    epochs=30,
+    batch_size=8,
+    lr=3e-4,
+    crop=512,
+    num_workers=2,
+    max_train_tiles=None,
+    max_val_tiles=None,
+    pretrained=True,
+):
+    &quot;&quot;&quot;Train, evaluating on val_split after every epoch.
+
+    Writes to out_dir: last.pt (for resuming), best.pt (highest validation F1) and history.csv.
+    If out_dir already has last.pt, training resumes from it.
+    &quot;&quot;&quot;</code></pre></div></div><div class="chunk-text">
+<p>The training function and its settings, each with a default. Training used these defaults:
+tier1 for training, hold for validation, 30 epochs, batches of 8, learning rate 0.0003, 512-pixel crops.</p></div></div><div class="chunk"><div class="chunk-code"><p class="where">lines 85–88</p><div class="code"><pre class="ln" aria-hidden="true">85
+86
+87
+88</pre><pre class="src"><code class="language-python">    data_root, out_dir = Path(data_root), Path(out_dir)
+    out_dir.mkdir(parents=True, exist_ok=True)
+    device = pick_device()
+    use_amp = device.type == &quot;cuda&quot;</code></pre></div></div><div class="chunk-text">
+<p>Setup: make sure the output folder exists, pick the device, and decide on <b>mixed precision</b>
+(<code>use_amp</code>): on NVIDIA GPUs, half-size 16-bit numbers make training faster. It is off on your Mac
+(<code>mps</code>), where everything runs in normal 32-bit precision.</p></div></div><div class="chunk"><div class="chunk-code"><p class="where">lines 90–95</p><div class="code"><pre class="ln" aria-hidden="true">90
+91
+92
+93
+94
+95</pre><pre class="src"><code class="language-python">    train_ds = BuildingDataset([data_root / s for s in train_splits], crop=crop, augment=True, max_tiles=max_train_tiles)
+    val_ds = BuildingDataset([data_root / val_split], crop=None, augment=False, max_tiles=max_val_tiles)
+    train_loader = DataLoader(train_ds, batch_size=batch_size, shuffle=True, num_workers=num_workers,
+                              pin_memory=use_amp, drop_last=True, persistent_workers=num_workers &gt; 0)
+    val_loader = DataLoader(val_ds, batch_size=max(1, batch_size // 4), num_workers=num_workers)
+    print(f&quot;device={device}  train tiles={len(train_ds)}  val tiles={len(val_ds)}&quot;)</code></pre></div></div><div class="chunk-text">
+<p>Two datasets and their loaders.</p>
+<ul>
+<li>Training: random crops with augmentation; <code>shuffle=True</code> gives a new random order every epoch; <code>drop_last=True</code> drops the last incomplete batch (2,799 / 8 = 349 full batches); <code>persistent_workers</code> keeps the helper processes alive between epochs.</li>
+<li>Validation: full 1024 × 1024 tiles, no augmentation, so the score is measured the same way every time; batch of 2 because full tiles use 4 times more memory.</li>
+</ul></div></div><div class="chunk"><div class="chunk-code"><p class="where">lines 97–100</p><div class="code"><pre class="ln" aria-hidden="true">97
+98
+99
+100</pre><pre class="src"><code class="language-python">    model = build_model(pretrained).to(device)
+    optimizer = torch.optim.AdamW(model.parameters(), lr=lr, weight_decay=1e-4)
+    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=epochs)
+    scaler = torch.amp.GradScaler(&quot;cuda&quot;, enabled=use_amp)</code></pre></div></div><div class="chunk-text">
+<p>The learning machinery.</p>
+<ul>
+<li><code>.to(device)</code> moves the model's parameters to the GPU.</li>
+<li><b>AdamW</b> is the <b>optimizer</b>: the rule that updates each parameter after each batch. Adam adapts the step size of each parameter to how its gradients behave; the "W" adds <b>weight decay</b> (<code>1e-4</code>), a small pull of every weight towards zero that reduces overfitting.</li>
+<li><b>CosineAnnealingLR</b> lowers the learning rate along half a cosine curve, from 0.0003 at the start to almost 0 after 30 epochs: big steps early, fine adjustments late. This is why the score jumped around in the first half and settled in the second.</li>
+<li><code>GradScaler</code> belongs to mixed precision and does nothing on your Mac.</li>
+</ul></div></div><div class="chunk"><div class="chunk-code"><p class="where">lines 102–110</p><div class="code"><pre class="ln" aria-hidden="true">102
+103
+104
+105
+106
+107
+108
+109
+110</pre><pre class="src"><code class="language-python">    start_epoch, best_f1 = 0, 0.0
+    last_path = out_dir / &quot;last.pt&quot;
+    if last_path.exists():
+        ckpt = torch.load(last_path, map_location=device)
+        model.load_state_dict(ckpt[&quot;model&quot;])
+        optimizer.load_state_dict(ckpt[&quot;optimizer&quot;])
+        scheduler.load_state_dict(ckpt[&quot;scheduler&quot;])
+        start_epoch, best_f1 = ckpt[&quot;epoch&quot;] + 1, ckpt[&quot;best_f1&quot;]
+        print(f&quot;resumed from epoch {start_epoch}, best F1 so far {best_f1:.4f}&quot;)</code></pre></div></div><div class="chunk-text">
+<p><b>Resuming.</b> If <code>last.pt</code> (a <b>checkpoint</b>, a saved copy) exists, load the model weights, the
+optimizer's internal state, the learning-rate schedule and the epoch counter, and continue from the next epoch.
+This is why rerunning the command after an interruption continues instead of starting over.</p></div></div><div class="chunk"><div class="chunk-code"><p class="where">lines 112–113</p><div class="code"><pre class="ln" aria-hidden="true">112
+113</pre><pre class="src"><code class="language-python">    history_path = out_dir / &quot;history.csv&quot;
+    for epoch in range(start_epoch, epochs):</code></pre></div></div><div class="chunk-text">
+<p>The <b>epoch loop</b>. One epoch is one pass over all training tiles. <code>range(start_epoch, epochs)</code> goes
+from 0 (or the resume point) to 29.</p></div></div><div class="chunk"><div class="chunk-code"><p class="where">lines 114–124</p><div class="code"><pre class="ln" aria-hidden="true">114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124</pre><pre class="src"><code class="language-python">        model.train()
+        started, total_loss = time.time(), 0.0
+        for images, masks in train_loader:
+            images, masks = images.to(device), masks.to(device)
+            optimizer.zero_grad(set_to_none=True)
+            with torch.autocast(device_type=&quot;cuda&quot;, dtype=torch.float16, enabled=use_amp):
+                loss = loss_fn(model(images), masks)
+            scaler.scale(loss).backward()
+            scaler.step(optimizer)
+            scaler.update()
+            total_loss += loss.item()</code></pre></div></div><div class="chunk-text">
+<p>The heart of training, run 349 times per epoch, once per batch:</p>
+<ol>
+<li><code>model.train()</code> switches layers to training behaviour.</li>
+<li><code>.to(device)</code> sends the batch to the GPU.</li>
+<li><code>zero_grad</code> clears the gradients left from the previous batch.</li>
+<li><code>model(images)</code>: the <b>forward pass</b>, the model's prediction; <code>loss_fn</code> scores it.</li>
+<li><code>.backward()</code>: <b>backpropagation</b>, which computes for each of the 24.4 million parameters how much the loss would change if that parameter changed (its <b>gradient</b>).</li>
+<li><code>step(optimizer)</code>: AdamW nudges every parameter a little in the direction that lowers the loss.</li>
+<li><code>loss.item()</code> is added up to report the average training loss.</li>
+</ol>
+<p>(<code>autocast</code> and <code>scaler</code> are mixed-precision helpers that do nothing on the Mac.)</p></div></div><div class="chunk"><div class="chunk-code"><p class="where">line 125</p><div class="code"><pre class="ln" aria-hidden="true">125</pre><pre class="src"><code class="language-python">        scheduler.step()</code></pre></div></div><div class="chunk-text"><p>After each epoch, lower the learning rate one step along the cosine curve.</p></div></div><div class="chunk"><div class="chunk-code"><p class="where">lines 127–130</p><div class="code"><pre class="ln" aria-hidden="true">127
+128
+129
+130</pre><pre class="src"><code class="language-python">        metrics = evaluate(model, val_loader, device)
+        row = {&quot;epoch&quot;: epoch + 1, &quot;train_loss&quot;: total_loss / len(train_loader), **metrics,
+               &quot;lr&quot;: optimizer.param_groups[0][&quot;lr&quot;], &quot;minutes&quot;: (time.time() - started) / 60}
+        print(&quot;  &quot;.join(f&quot;{k}={v:.4f}&quot; if isinstance(v, float) else f&quot;{k}={v}&quot; for k, v in row.items()), flush=True)</code></pre></div></div><div class="chunk-text">
+<p>Score on the 933 validation tiles and print one line per epoch, such as
+<code>epoch=27 train_loss=0.3174 f1=0.7918 precision=0.8185 recall=0.7668 ...</code>. <code>**metrics</code>
+unpacks the dictionary's entries into the new one.</p></div></div><div class="chunk"><div class="chunk-code"><p class="where">lines 132–137</p><div class="code"><pre class="ln" aria-hidden="true">132
+133
+134
+135
+136
+137</pre><pre class="src"><code class="language-python">        is_new_file = not history_path.exists()
+        with open(history_path, &quot;a&quot;, newline=&quot;&quot;) as f:
+            writer = csv.DictWriter(f, fieldnames=list(row))
+            if is_new_file:
+                writer.writeheader()
+            writer.writerow(row)</code></pre></div></div><div class="chunk-text">
+<p>Append the line to <code>history.csv</code>, writing column names first if the file is new. The progress display,
+the notebooks and the report all read this file.</p></div></div><div class="chunk"><div class="chunk-code"><p class="where">lines 139–143</p><div class="code"><pre class="ln" aria-hidden="true">139
+140
+141
+142
+143</pre><pre class="src"><code class="language-python">        if metrics[&quot;f1&quot;] &gt; best_f1:
+            best_f1 = metrics[&quot;f1&quot;]
+            torch.save({&quot;model&quot;: model.state_dict(), &quot;epoch&quot;: epoch, &quot;f1&quot;: best_f1}, out_dir / &quot;best.pt&quot;)
+        torch.save({&quot;model&quot;: model.state_dict(), &quot;optimizer&quot;: optimizer.state_dict(),
+                    &quot;scheduler&quot;: scheduler.state_dict(), &quot;epoch&quot;: epoch, &quot;best_f1&quot;: best_f1}, last_path)</code></pre></div></div><div class="chunk-text">
+<p>Two saves every epoch:</p>
+<ul>
+<li><code>best.pt</code>: only when the validation F1 beats the best so far. This is the model used later, from epoch 27 (F1 0.792).</li>
+<li><code>last.pt</code>: always, with everything needed to resume.</li>
+</ul>
+<p><code>state_dict()</code> is a dictionary of all parameter tensors.</p></div></div><div class="chunk"><div class="chunk-code"><p class="where">lines 145–146</p><div class="code"><pre class="ln" aria-hidden="true">145
+146</pre><pre class="src"><code class="language-python">    print(f&quot;done, best validation F1 {best_f1:.4f}&quot;)
+    return model</code></pre></div></div><div class="chunk-text"><p>Final message after the last epoch.</p></div></div><div class="chunk"><div class="chunk-code"><p class="where">lines 149–170</p><div class="code"><pre class="ln" aria-hidden="true">149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170</pre><pre class="src"><code class="language-python">if __name__ == &quot;__main__&quot;:
+    import argparse
+
+    parser = argparse.ArgumentParser(description=&quot;Train the building localization model.&quot;)
+    parser.add_argument(&quot;--data-root&quot;, default=&quot;data/processed&quot;)
+    parser.add_argument(&quot;--out-dir&quot;, default=&quot;runs/loc_resnet34&quot;)
+    parser.add_argument(&quot;--train-splits&quot;, nargs=&quot;+&quot;, default=[&quot;tier1&quot;])
+    parser.add_argument(&quot;--val-split&quot;, default=&quot;hold&quot;)
+    parser.add_argument(&quot;--epochs&quot;, type=int, default=30)
+    parser.add_argument(&quot;--batch-size&quot;, type=int, default=8)
+    parser.add_argument(&quot;--workers&quot;, type=int, default=4)
+    args = parser.parse_args()
+
+    train_localization(
+        data_root=args.data_root,
+        out_dir=args.out_dir,
+        train_splits=tuple(args.train_splits),
+        val_split=args.val_split,
+        epochs=args.epochs,
+        batch_size=args.batch_size,
+        num_workers=args.workers,
+    )</code></pre></div></div><div class="chunk-text">
+<p>The command-line interface. <code>argparse</code> reads options such as <code>--epochs 30</code> and passes them to
+<code>train_localization</code>. Note <code>--workers</code> defaults to 4 here: the number of helper processes loading
+images.</p></div></div></section><section class="file" id="src-damage-py"><h3><code>src/damage.py</code><span class="meta">273 lines</span></h3><p>The second model: it compares the before and after images and labels every pixel's damage level. It has the same structure as <code>train.py</code>; this walkthrough focuses on what is different.</p><div class="chunk"><div class="chunk-code"><p class="where">lines 1–15</p><div class="code"><pre class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15</pre><pre class="src"><code class="language-python">&quot;&quot;&quot;Phase 3: damage classification.
+
+The model sees the pre- and post-disaster images stacked into one 6-channel input and labels
+every pixel as background (0), no damage (1), minor (2), major (3) or destroyed (4).
+Buildings marked un-classified in xBD are ignored during training.
+
+Scoring follows the xView2 challenge:
+    localization F1  pixel F1 for building vs background
+    damage F1        harmonic mean of the per-class F1 for the 4 damage levels, on building pixels
+    score            0.3 * localization F1 + 0.7 * damage F1
+
+Usage (from the project root; rerunning the same command resumes from the last epoch):
+
+    /opt/anaconda3/bin/python3 -m src.damage --epochs 30
+&quot;&quot;&quot;</code></pre></div></div><div class="chunk-text"><p>Docstring with the classes and the xView2 scoring formula.</p></div></div><div class="chunk"><div class="chunk-code"><p class="where">lines 17–29</p><div class="code"><pre class="ln" aria-hidden="true">17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29</pre><pre class="src"><code class="language-python">import csv
+import time
+from pathlib import Path
+
+import cv2
+import numpy as np
+import segmentation_models_pytorch as smp
+import torch
+import torch.nn.functional as F
+from torch.utils.data import DataLoader, Dataset
+
+from src.dataset import read_rgb, to_tensor
+from src.train import pick_device</code></pre></div></div><div class="chunk-text"><p>Same libraries as <code>train.py</code>, plus OpenCV and numpy. It reuses <code>read_rgb</code>, <code>to_tensor</code> and <code>pick_device</code> from the other files instead of copying them.</p></div></div><div class="chunk"><div class="chunk-code"><p class="where">lines 31–36</p><div class="code"><pre class="ln" aria-hidden="true">31
+32
+33
+34
+35
+36</pre><pre class="src"><code class="language-python">DAMAGE_NAMES = [&quot;no-damage&quot;, &quot;minor-damage&quot;, &quot;major-damage&quot;, &quot;destroyed&quot;]
+IGNORE = 255  # target value for un-classified buildings
+
+# Cross-entropy weights for background, no, minor, major, destroyed. No-damage buildings
+# outnumber each damaged class about 8 to 1 (see notebook 01), so damaged pixels count more.
+CLASS_WEIGHTS = [0.5, 1.0, 3.0, 3.0, 3.0]</code></pre></div></div><div class="chunk-text">
+<p><code>IGNORE = 255</code> is a special value: pixels of un-classified buildings get it, and the loss function is told
+to skip them, since there is no correct answer to learn. <code>CLASS_WEIGHTS</code> are the default <b>class weights</b>
+(v1): a mistake on a damaged pixel costs 3 times as much as on an undamaged one, and background costs half, because
+damaged buildings are rare. v2 used <code>0.5, 1, 6, 3, 3</code> and v3 <code>0.5, 1, 4, 4, 3</code>, passed on the command line.</p></div></div><div class="chunk"><div class="chunk-code"><p class="where">lines 39–56</p><div class="code"><pre class="ln" aria-hidden="true">39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56</pre><pre class="src"><code class="language-python">class DamageDataset(Dataset):
+    &quot;&quot;&quot;Pre + post image -&gt; per-pixel damage class, from the files written by src/preprocess.py.&quot;&quot;&quot;
+
+    def __init__(self, split_dirs, crop=512, augment=True, max_tiles=None):
+        self.mask_paths = []
+        for d in split_dirs:
+            self.mask_paths += sorted(Path(d, &quot;masks&quot;).glob(&quot;*.png&quot;))
+        if max_tiles:
+            self.mask_paths = self.mask_paths[:max_tiles]
+        self.crop = crop
+        self.augment = augment
+
+    def __len__(self):
+        return len(self.mask_paths)
+
+    def image_path(self, i, phase):
+        mask_path = self.mask_paths[i]
+        return mask_path.parent.parent / &quot;images&quot; / f&quot;{mask_path.stem}_{phase}.jpg&quot;</code></pre></div></div><div class="chunk-text"><p>Same as <code>BuildingDataset</code>: collects mask paths. <code>image_path</code> takes a phase, <code>"pre"</code> or <code>"post"</code>.</p></div></div><div class="chunk"><div class="chunk-code"><p class="where">lines 58–77</p><div class="code"><pre class="ln" aria-hidden="true">58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77</pre><pre class="src"><code class="language-python">    def __getitem__(self, i):
+        pre = read_rgb(self.image_path(i, &quot;pre&quot;))
+        post = read_rgb(self.image_path(i, &quot;post&quot;))
+        target = cv2.imread(str(self.mask_paths[i]), cv2.IMREAD_GRAYSCALE)
+        target[target == 5] = IGNORE
+
+        if self.crop:
+            h, w = target.shape
+            y = np.random.randint(0, h - self.crop + 1)
+            x = np.random.randint(0, w - self.crop + 1)
+            pre, post = pre[y:y + self.crop, x:x + self.crop], post[y:y + self.crop, x:x + self.crop]
+            target = target[y:y + self.crop, x:x + self.crop]
+
+        if self.augment:
+            if np.random.rand() &lt; 0.5:
+                pre, post, target = pre[:, ::-1], post[:, ::-1], target[:, ::-1]
+            if np.random.rand() &lt; 0.5:
+                pre, post, target = pre[::-1], post[::-1], target[::-1]
+            k = np.random.randint(4)
+            pre, post, target = np.rot90(pre, k), np.rot90(post, k), np.rot90(target, k)</code></pre></div></div><div class="chunk-text">
+<p>Reads both images and the mask. The mask keeps its exact values 0–4, and line 62 replaces every 5
+(un-classified) with 255 (ignore). The crop and augmentation are the same as before, applied identically to
+<b>all three</b> arrays, otherwise before, after and labels would no longer line up.</p></div></div><div class="chunk"><div class="chunk-code"><p class="where">lines 79–80</p><div class="code"><pre class="ln" aria-hidden="true">79
+80</pre><pre class="src"><code class="language-python">        x = torch.cat([to_tensor(pre), to_tensor(post)])
+        return x, torch.from_numpy(target.astype(np.int64))</code></pre></div></div><div class="chunk-text">
+<p><code>torch.cat</code> stacks the before image (3 channels) and the after image (3 channels) into one
+<b>6-channel</b> input of shape <code>(6, 512, 512)</code>. The target becomes whole numbers (<code>int64</code>), which
+cross-entropy needs for class labels.</p></div></div><div class="chunk"><div class="chunk-code"><p class="where">lines 83–85</p><div class="code"><pre class="ln" aria-hidden="true">83
+84
+85</pre><pre class="src"><code class="language-python">def build_model(pretrained=True):
+    # smp adapts the pretrained first layer to 6 input channels
+    return smp.Unet(&quot;resnet34&quot;, encoder_weights=&quot;imagenet&quot; if pretrained else None, in_channels=6, classes=5)</code></pre></div></div><div class="chunk-text">
+<p>The same U-Net with a ResNet-34 encoder, but <code>in_channels=6</code> and <code>classes=5</code> (background +
+4 damage levels). The pretrained first layer expects 3 channels; <code>smp</code> adapts it to 6 by reusing the
+pretrained weights. The model has 24,446,357 parameters.</p></div></div><div class="chunk"><div class="chunk-code"><p class="where">lines 88–89</p><div class="code"><pre class="ln" aria-hidden="true">88
+89</pre><pre class="src"><code class="language-python">def loss_fn(logits, target, weights):
+    return F.cross_entropy(logits, target, weight=weights, ignore_index=IGNORE)</code></pre></div></div><div class="chunk-text">
+<p><b>Cross-entropy</b> for 5 classes: for every pixel, the model gives 5 scores; softmax turns them into
+probabilities; the loss is high when the probability of the correct class is low. <code>weight=</code> applies the
+class weights; <code>ignore_index=</code> skips un-classified pixels.</p></div></div><div class="chunk"><div class="chunk-code"><p class="where">lines 92–95</p><div class="code"><pre class="ln" aria-hidden="true">92
+93
+94
+95</pre><pre class="src"><code class="language-python">def f1(tp, fp, fn):
+    precision = tp / max(tp + fp, 1)
+    recall = tp / max(tp + fn, 1)
+    return 2 * precision * recall / max(precision + recall, 1e-9)</code></pre></div></div><div class="chunk-text"><p>Precision, recall and F1 from counts, as in <code>train.py</code>, as a small reusable function.</p></div></div><div class="chunk"><div class="chunk-code"><p class="where">lines 98–102</p><div class="code"><pre class="ln" aria-hidden="true">98
+99
+100
+101
+102</pre><pre class="src"><code class="language-python">def predict_classes(logits):
+    &quot;&quot;&quot;Building/background from the full output; damage level chosen among classes 1-4 only.&quot;&quot;&quot;
+    is_building = logits.argmax(1) &gt; 0
+    damage = logits[:, 1:5].argmax(1) + 1
+    return is_building, damage</code></pre></div></div><div class="chunk-text">
+<p>Turns the 5 output scores per pixel into decisions, in two steps:</p>
+<ul>
+<li><code>argmax(1) &gt; 0</code>: the class with the highest score; if it is not background (0), the pixel is a building.</li>
+<li><code>logits[:, 1:5].argmax(1) + 1</code>: the damage level among the four damage scores only, so every building pixel always gets a level even if background was a close second.</li>
+</ul></div></div><div class="chunk"><div class="chunk-code"><p class="where">lines 105–130</p><div class="code"><pre class="ln" aria-hidden="true">105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130</pre><pre class="src"><code class="language-python">@torch.no_grad()
+def evaluate(model, loader, device):
+    model.eval()
+    loc = np.zeros(3)  # tp, fp, fn
+    dmg = np.zeros((4, 3))
+    for x, target in loader:
+        is_building, damage = predict_classes(model(x.to(device)))
+        target = target.to(device)
+        true_building = target &gt; 0  # includes un-classified buildings
+        loc += [(is_building &amp; true_building).sum().item(),
+                (is_building &amp; ~true_building).sum().item(),
+                (~is_building &amp; true_building).sum().item()]
+        scored = (target &gt;= 1) &amp; (target &lt;= 4)
+        for c in range(1, 5):
+            pred_c, true_c = (damage == c) &amp; scored, (target == c) &amp; scored
+            dmg[c - 1] += [(pred_c &amp; true_c).sum().item(),
+                           (pred_c &amp; ~true_c).sum().item(),
+                           (~pred_c &amp; true_c).sum().item()]
+
+    loc_f1 = f1(*loc)
+    class_f1 = [f1(*row) for row in dmg]
+    damage_f1 = len(class_f1) / sum(1 / max(v, 1e-6) for v in class_f1)
+    metrics = {&quot;score&quot;: 0.3 * loc_f1 + 0.7 * damage_f1, &quot;loc_f1&quot;: loc_f1, &quot;damage_f1&quot;: damage_f1}
+    metrics.update({f&quot;f1_{name}&quot;: v for name, v in zip(DAMAGE_NAMES, class_f1)})
+    # plain floats, since numpy scalars in a checkpoint make torch.load refuse it
+    return {k: float(v) for k, v in metrics.items()}</code></pre></div></div><div class="chunk-text">
+<p>The <b>xView2 scoring</b> on the validation split.</p>
+<ul>
+<li><code>loc</code> counts true positives, false positives and false negatives for building vs background (lines 113–116).</li>
+<li><code>scored</code> marks pixels whose true level is 1–4; only these count for damage.</li>
+<li>For each level <code>c</code>, count the three kinds of agreement (lines 118–122), giving a 4 × 3 table.</li>
+<li>Line 126 is the <b>harmonic mean</b> of the four F1 values: 4 / (1/F1₁ + 1/F1₂ + 1/F1₃ + 1/F1₄). It is pulled down strongly by any weak class, which is why v2's near-zero major damage collapsed its score.</li>
+<li>Line 127: score = 0.3 × localization F1 + 0.7 × damage F1.</li>
+<li>Line 130 converts every value to a plain Python <code>float</code>. This fixed a real bug: numpy number types saved inside a checkpoint made <code>torch.load</code> refuse the file, so resuming would have crashed.</li>
+</ul></div></div><div class="chunk"><div class="chunk-code"><p class="where">lines 133–152</p><div class="code"><pre class="ln" aria-hidden="true">133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152</pre><pre class="src"><code class="language-python">@torch.no_grad()
+def building_confusion(model, dataset, device):
+    &quot;&quot;&quot;Building-level 4x4 confusion matrix (rows true, columns predicted).
+
+    Each true building&#x27;s predicted level is the most common predicted level inside it.
+    Buildings are connected regions of the true mask, so touching buildings count as one.
+    &quot;&quot;&quot;
+    model.eval()
+    matrix = np.zeros((4, 4), dtype=int)
+    for i in range(len(dataset)):
+        x, target = dataset[i]
+        _, damage = predict_classes(model(x[None].to(device)))
+        damage, target = damage[0].cpu().numpy(), target.numpy()
+        n, components = cv2.connectedComponents(((target &gt;= 1) &amp; (target &lt;= 4)).astype(np.uint8))
+        for k in range(1, n):
+            inside = components == k
+            true_level = np.bincount(target[inside], minlength=5)[1:].argmax()
+            pred_level = np.bincount(damage[inside], minlength=5)[1:].argmax()
+            matrix[true_level, pred_level] += 1
+    return matrix</code></pre></div></div><div class="chunk-text">
+<p>The <b>building-level confusion matrix</b>, which is easier to explain than pixel scores. For each tile, it
+finds every separate true building with <code>cv2.connectedComponents</code> (which labels each connected blob of
+pixels with its own number). Inside each building it counts the true levels and the predicted levels with
+<code>np.bincount</code>, takes the most common of each, and adds one to the matrix cell [true, predicted].</p></div></div><div class="chunk"><div class="chunk-code"><p class="where">lines 155–202</p><details class="long"><summary>Show lines 155–202 (48 lines)</summary><div class="code"><pre class="ln" aria-hidden="true">155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180
+181
+182
+183
+184
+185
+186
+187
+188
+189
+190
+191
+192
+193
+194
+195
+196
+197
+198
+199
+200
+201
+202</pre><pre class="src"><code class="language-python">def train_damage(
+    data_root,
+    out_dir,
+    train_splits=(&quot;tier1&quot;,),
+    val_split=&quot;hold&quot;,
+    epochs=30,
+    batch_size=8,
+    lr=3e-4,
+    crop=512,
+    num_workers=4,
+    max_train_tiles=None,
+    max_val_tiles=None,
+    pretrained=True,
+    class_weights=CLASS_WEIGHTS,
+    init_from=None,
+):
+    &quot;&quot;&quot;Train, evaluating on val_split after every epoch. Saves last.pt, best.pt (highest score) and history.csv.
+
+    init_from: a checkpoint (e.g. runs/damage_resnet34/best.pt) whose weights the model starts from,
+    instead of only the ImageNet encoder. Ignored when resuming a run.
+    &quot;&quot;&quot;
+    data_root, out_dir = Path(data_root), Path(out_dir)
+    out_dir.mkdir(parents=True, exist_ok=True)
+    device = pick_device()
+    use_amp = device.type == &quot;cuda&quot;
+
+    train_ds = DamageDataset([data_root / s for s in train_splits], crop=crop, augment=True, max_tiles=max_train_tiles)
+    val_ds = DamageDataset([data_root / val_split], crop=None, augment=False, max_tiles=max_val_tiles)
+    train_loader = DataLoader(train_ds, batch_size=batch_size, shuffle=True, num_workers=num_workers,
+                              pin_memory=use_amp, drop_last=True, persistent_workers=num_workers &gt; 0)
+    val_loader = DataLoader(val_ds, batch_size=max(1, batch_size // 4), num_workers=num_workers)
+    print(f&quot;device={device}  train tiles={len(train_ds)}  val tiles={len(val_ds)}  class weights={list(class_weights)}&quot;)
+
+    model = build_model(pretrained).to(device)
+    weights = torch.tensor(class_weights, device=device, dtype=torch.float32)
+    optimizer = torch.optim.AdamW(model.parameters(), lr=lr, weight_decay=1e-4)
+    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=epochs)
+    scaler = torch.amp.GradScaler(&quot;cuda&quot;, enabled=use_amp)
+
+    start_epoch, best_score = 0, 0.0
+    last_path = out_dir / &quot;last.pt&quot;
+    if last_path.exists():
+        ckpt = torch.load(last_path, map_location=device)
+        model.load_state_dict(ckpt[&quot;model&quot;])
+        optimizer.load_state_dict(ckpt[&quot;optimizer&quot;])
+        scheduler.load_state_dict(ckpt[&quot;scheduler&quot;])
+        start_epoch, best_score = ckpt[&quot;epoch&quot;] + 1, ckpt[&quot;best_score&quot;]
+        print(f&quot;resumed from epoch {start_epoch}, best score so far {best_score:.4f}&quot;)</code></pre></div></details></div><div class="chunk-text">
+<p>The training function. Its body is the same as <code>train_localization</code> (datasets, loaders, AdamW, cosine
+schedule, resume, epoch loop, history, best/last checkpoints), with three differences: the loss takes the class
+weights, the best checkpoint is chosen by the xView2 <b>score</b> instead of F1, and the new
+<code>init_from</code> option.</p></div></div><div class="chunk"><div class="chunk-code"><p class="where">lines 203–242</p><div class="code"><pre class="ln" aria-hidden="true">203
+204
+205
+206
+207
+208
+209
+210
+211
+212
+213
+214
+215
+216
+217
+218
+219
+220
+221
+222
+223
+224
+225
+226
+227
+228
+229
+230
+231
+232
+233
+234
+235
+236
+237
+238
+239
+240
+241
+242</pre><pre class="src"><code class="language-python">    elif init_from:
+        model.load_state_dict(torch.load(init_from, map_location=device)[&quot;model&quot;])
+        print(f&quot;starting from the weights in {init_from}&quot;)
+
+    history_path = out_dir / &quot;history.csv&quot;
+    for epoch in range(start_epoch, epochs):
+        model.train()
+        started, total_loss = time.time(), 0.0
+        for x, target in train_loader:
+            x, target = x.to(device), target.to(device)
+            optimizer.zero_grad(set_to_none=True)
+            with torch.autocast(device_type=&quot;cuda&quot;, dtype=torch.float16, enabled=use_amp):
+                loss = loss_fn(model(x), target, weights)
+            scaler.scale(loss).backward()
+            scaler.step(optimizer)
+            scaler.update()
+            total_loss += loss.item()
+        scheduler.step()
+
+        metrics = evaluate(model, val_loader, device)
+        row = {&quot;epoch&quot;: epoch + 1, &quot;train_loss&quot;: total_loss / len(train_loader), **metrics,
+               &quot;lr&quot;: optimizer.param_groups[0][&quot;lr&quot;], &quot;minutes&quot;: (time.time() - started) / 60}
+        print(&quot;  &quot;.join(f&quot;{k}={v:.4f}&quot; if isinstance(v, float) else f&quot;{k}={v}&quot; for k, v in row.items()), flush=True)
+
+        is_new_file = not history_path.exists()
+        with open(history_path, &quot;a&quot;, newline=&quot;&quot;) as f:
+            writer = csv.DictWriter(f, fieldnames=list(row))
+            if is_new_file:
+                writer.writeheader()
+            writer.writerow(row)
+
+        if metrics[&quot;score&quot;] &gt; best_score:
+            best_score = metrics[&quot;score&quot;]
+            torch.save({&quot;model&quot;: model.state_dict(), &quot;epoch&quot;: epoch, &quot;score&quot;: best_score, &quot;metrics&quot;: metrics},
+                       out_dir / &quot;best.pt&quot;)
+        torch.save({&quot;model&quot;: model.state_dict(), &quot;optimizer&quot;: optimizer.state_dict(),
+                    &quot;scheduler&quot;: scheduler.state_dict(), &quot;epoch&quot;: epoch, &quot;best_score&quot;: best_score}, last_path)
+
+    print(f&quot;done, best validation score {best_score:.4f}&quot;)
+    return model</code></pre></div></div><div class="chunk-text">
+<p><b>Starting from an existing model</b>, added for v3. When not resuming, the model's weights are replaced by those in
+another checkpoint (v1's <code>best.pt</code>), so training continues from a model that already knows the task,
+instead of from the ImageNet encoder alone. Together with the lower learning rate, this <b>fine-tunes</b> v1.</p></div></div><div class="chunk"><div class="chunk-code"><p class="where">lines 245–273</p><div class="code"><pre class="ln" aria-hidden="true">245
+246
+247
+248
+249
+250
+251
+252
+253
+254
+255
+256
+257
+258
+259
+260
+261
+262
+263
+264
+265
+266
+267
+268
+269
+270
+271
+272
+273</pre><pre class="src"><code class="language-python">if __name__ == &quot;__main__&quot;:
+    import argparse
+
+    parser = argparse.ArgumentParser(description=&quot;Train the damage classification model.&quot;)
+    parser.add_argument(&quot;--data-root&quot;, default=&quot;data/processed&quot;)
+    parser.add_argument(&quot;--out-dir&quot;, default=&quot;runs/damage_resnet34&quot;)
+    parser.add_argument(&quot;--train-splits&quot;, nargs=&quot;+&quot;, default=[&quot;tier1&quot;])
+    parser.add_argument(&quot;--val-split&quot;, default=&quot;hold&quot;)
+    parser.add_argument(&quot;--epochs&quot;, type=int, default=30)
+    parser.add_argument(&quot;--batch-size&quot;, type=int, default=8)
+    parser.add_argument(&quot;--workers&quot;, type=int, default=4)
+    parser.add_argument(&quot;--lr&quot;, type=float, default=3e-4)
+    parser.add_argument(&quot;--init-from&quot;, help=&quot;checkpoint to start from, e.g. runs/damage_resnet34/best.pt&quot;)
+    parser.add_argument(&quot;--class-weights&quot;, nargs=5, type=float, default=CLASS_WEIGHTS,
+                        metavar=(&quot;BG&quot;, &quot;NO&quot;, &quot;MINOR&quot;, &quot;MAJOR&quot;, &quot;DESTROYED&quot;))
+    args = parser.parse_args()
+
+    train_damage(
+        data_root=args.data_root,
+        out_dir=args.out_dir,
+        train_splits=tuple(args.train_splits),
+        val_split=args.val_split,
+        epochs=args.epochs,
+        batch_size=args.batch_size,
+        num_workers=args.workers,
+        class_weights=args.class_weights,
+        lr=args.lr,
+        init_from=args.init_from,
+    )</code></pre></div></div><div class="chunk-text">
+<p>Command-line options, including the three added for v2 and v3: <code>--class-weights</code> (exactly 5 numbers),
+<code>--lr</code> and <code>--init-from</code>. The v3 command was:</p>
+<pre class="cmd">python -m src.damage --out-dir runs/damage_v3 --train-splits tier1 tier3 --epochs 10 \
+    --lr 1e-4 --init-from runs/damage_resnet34/best.pt --class-weights 0.5 1 4 4 3</pre></div></div></section><section class="file" id="src-predict-py"><h3><code>src/predict.py</code><span class="meta">202 lines</span></h3><p>Uses both trained models on new tiles and turns per-pixel predictions into buildings on a map.</p><div class="chunk"><div class="chunk-code"><p class="where">lines 1–16</p><div class="code"><pre class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16</pre><pre class="src"><code class="language-python">&quot;&quot;&quot;Phase 4: run both trained models on tiles and export the results for the map dashboard.
+
+For each tile:
+  1. the localization model (phase 2) gives a building probability per pixel
+  2. the damage model (phase 3) gives damage-level probabilities per pixel
+  3. building pixels are split into separate buildings (connected regions)
+  4. each building gets the damage level with the highest average probability inside it
+  5. outlines are converted from pixels to longitude/latitude (see georeference)
+
+Usage (from the project root):
+
+    /opt/anaconda3/bin/python3 -m src.predict                     # hurricane tiles in hold and test
+    /opt/anaconda3/bin/python3 -m src.predict --splits hold
+
+Writes into dashboard/: data/&lt;disaster&gt;.geojson, data/tiles.json and images/&lt;tile&gt;_{pre,post}.jpg.
+&quot;&quot;&quot;</code></pre></div></div><div class="chunk-text"><p>Docstring listing the five steps applied to each tile.</p></div></div><div class="chunk"><div class="chunk-code"><p class="where">lines 18–34</p><div class="code"><pre class="ln" aria-hidden="true">18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34</pre><pre class="src"><code class="language-python">import argparse
+import json
+from collections import defaultdict
+from pathlib import Path
+
+import cv2
+import numpy as np
+import tifffile
+import torch
+
+from src import damage, train
+from src.dataset import read_rgb, to_tensor
+from src.xbd import parse_wkt_polygon
+
+DAMAGE_NAMES = damage.DAMAGE_NAMES
+MIN_BUILDING_PIXELS = 30  # smaller blobs are almost always noise
+DASHBOARD = Path(&quot;dashboard&quot;)</code></pre></div></div><div class="chunk-text"><p><code>defaultdict(list)</code> is a dictionary that creates an empty list the first time a key is used: handy for grouping buildings by disaster. Buildings smaller than 30 pixels are ignored as noise.</p></div></div><div class="chunk"><div class="chunk-code"><p class="where">lines 37–42</p><div class="code"><pre class="ln" aria-hidden="true">37
+38
+39
+40
+41
+42</pre><pre class="src"><code class="language-python">def load_models(device, loc_run=&quot;runs/loc_resnet34&quot;, damage_run=&quot;runs/damage_resnet34&quot;):
+    loc_model = train.build_model(pretrained=False).to(device).eval()
+    loc_model.load_state_dict(torch.load(Path(loc_run) / &quot;best.pt&quot;, map_location=device)[&quot;model&quot;])
+    dmg_model = damage.build_model(pretrained=False).to(device).eval()
+    dmg_model.load_state_dict(torch.load(Path(damage_run) / &quot;best.pt&quot;, map_location=device)[&quot;model&quot;])
+    return loc_model, dmg_model</code></pre></div></div><div class="chunk-text"><p>Builds both architectures without downloading weights, then loads our trained weights from the <code>best.pt</code> files. <code>.eval()</code> switches both to prediction mode.</p></div></div><div class="chunk"><div class="chunk-code"><p class="where">lines 45–51</p><div class="code"><pre class="ln" aria-hidden="true">45
+46
+47
+48
+49
+50
+51</pre><pre class="src"><code class="language-python">@torch.no_grad()
+def predict_maps(loc_model, dmg_model, pre, post, device):
+    &quot;&quot;&quot;Per-pixel building probability (H, W) and damage-level probabilities (4, H, W).&quot;&quot;&quot;
+    building = torch.sigmoid(loc_model(to_tensor(pre)[None].to(device)))[0, 0]
+    x = torch.cat([to_tensor(pre), to_tensor(post)])[None].to(device)
+    levels = torch.softmax(dmg_model(x)[0, 1:5], dim=0)  # damage levels only, background left out
+    return building.cpu().numpy(), levels.cpu().numpy()</code></pre></div></div><div class="chunk-text">
+<p>Runs both models on one tile at full size. <code>[None]</code> adds a batch dimension of 1.</p>
+<ul>
+<li>Localization: <code>sigmoid</code> gives a building probability per pixel; <code>[0, 0]</code> takes the first image and its only channel.</li>
+<li>Damage: <code>[0, 1:5]</code> keeps the four damage scores; <code>softmax(dim=0)</code> turns them into four probabilities that add up to 1 for each pixel.</li>
+</ul></div></div><div class="chunk"><div class="chunk-code"><p class="where">lines 54–72</p><div class="code"><pre class="ln" aria-hidden="true">54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72</pre><pre class="src"><code class="language-python">def extract_buildings(building_prob, level_prob, threshold=0.5):
+    &quot;&quot;&quot;Split the building mask into separate buildings, each with a damage level and outline in pixels.&quot;&quot;&quot;
+    n, components = cv2.connectedComponents((building_prob &gt; threshold).astype(np.uint8))
+    buildings = []
+    for k in range(1, n):
+        inside = components == k
+        if inside.sum() &lt; MIN_BUILDING_PIXELS:
+            continue
+        mean_prob = level_prob[:, inside].mean(axis=1)
+        contours, _ = cv2.findContours(inside.astype(np.uint8), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        outline = cv2.approxPolyDP(max(contours, key=cv2.contourArea), 1.0, True)[:, 0, :]
+        if len(outline) &lt; 3:
+            continue
+        buildings.append({
+            &quot;damage&quot;: int(mean_prob.argmax()) + 1,
+            &quot;confidence&quot;: float(mean_prob.max()),
+            &quot;outline&quot;: outline.astype(np.float64),
+        })
+    return buildings</code></pre></div></div><div class="chunk-text">
+<p>From pixels to buildings.</p>
+<ul>
+<li>Line 56: probability above 0.5 = building pixel; <code>connectedComponents</code> gives each connected blob its own number (this is also why touching houses merge into one).</li>
+<li>Line 62: average the four damage probabilities over the building's pixels; the highest is its level, and its value is reported as the <b>confidence</b>.</li>
+<li>Line 63: <code>findContours</code> traces the blob's outline; line 64 keeps the largest and simplifies it with <code>approxPolyDP</code> (corners closer than 1 pixel to a straight line are dropped).</li>
+</ul></div></div><div class="chunk"><div class="chunk-code"><p class="where">lines 75–106</p><div class="code"><pre class="ln" aria-hidden="true">75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106</pre><pre class="src"><code class="language-python">def georeference(label_path, tif_path):
+    &quot;&quot;&quot;Pixel -&gt; (longitude, latitude) function for a tile.
+
+    The label file lists every building both in pixels and in longitude/latitude, which fixes an
+    exact affine transform. The GeoTIFF tags are used only for tiles without buildings: they claim
+    square pixels in degrees, which is wrong away from the equator and shifts buildings by about
+    30 m (up to 84 m; see src/check_georef.py).
+    &quot;&quot;&quot;
+    with open(label_path) as f:
+        features = json.load(f)[&quot;features&quot;]
+    pixel_outlines = {feat[&quot;properties&quot;][&quot;uid&quot;]: parse_wkt_polygon(feat[&quot;wkt&quot;]) for feat in features[&quot;xy&quot;]}
+    pixels, lnglats = [], []
+    for feat in features[&quot;lng_lat&quot;]:
+        xy, lnglat = pixel_outlines.get(feat[&quot;properties&quot;][&quot;uid&quot;]), parse_wkt_polygon(feat[&quot;wkt&quot;])
+        if xy is not None and len(xy) == len(lnglat):
+            pixels.append(xy)
+            lnglats.append(lnglat)
+
+    if sum(len(p) for p in pixels) &gt;= 3:
+        pixels = np.vstack(pixels)
+        coef = np.linalg.lstsq(np.column_stack([pixels, np.ones(len(pixels))]), np.vstack(lnglats), rcond=None)[0]
+    else:
+        with tifffile.TiffFile(tif_path) as tif:
+            tags = tif.pages[0].tags
+            scale_x, scale_y = tags[&quot;ModelPixelScaleTag&quot;].value[:2]
+            lon0, lat0 = tags[&quot;ModelTiepointTag&quot;].value[3:5]
+        coef = np.array([[scale_x, 0.0], [0.0, -scale_y], [lon0, lat0]])
+
+    def to_lnglat(xy):
+        return np.column_stack([xy, np.ones(len(xy))]) @ coef
+
+    return to_lnglat</code></pre></div></div><div class="chunk-text">
+<p>Converts pixel positions to longitude/latitude, the project's main finding in code. Each label file lists every
+building twice: in pixels and in longitude/latitude. Lines 85–91 pair them up by building id.</p>
+<p>Line 95 is an <b>affine transform</b> fitted by <b>least squares</b>: find the 6 numbers in <code>coef</code> so that
+<code>[x, y, 1] @ coef ≈ [longitude, latitude]</code> for all corners at once. An affine transform can scale, shift,
+rotate and shear, which covers how a map relates to a flat photo of a small area. The fit is exact to within
+10 cm on every image.</p>
+<p>Lines 97–101: tiles with no buildings fall back to the GeoTIFF tags, which are about 30 m off (see
+<code>check_georef.py</code>). Lines 103–106 return a small function that applies the transform to any points.</p></div></div><div class="chunk"><div class="chunk-code"><p class="where">lines 109–111</p><div class="code"><pre class="ln" aria-hidden="true">109
+110
+111</pre><pre class="src"><code class="language-python">def geojson_polygon(lnglat):
+    ring = np.round(lnglat, 7).tolist()
+    return {&quot;type&quot;: &quot;Polygon&quot;, &quot;coordinates&quot;: [ring + [ring[0]]]}</code></pre></div></div><div class="chunk-text"><p>Writes a ring of points in <b>GeoJSON</b>, the standard text format web maps read. The ring must end where it starts, so the first point is repeated. 7 decimals of a degree is about 1 cm.</p></div></div><div class="chunk"><div class="chunk-code"><p class="where">lines 114–133</p><div class="code"><pre class="ln" aria-hidden="true">114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133</pre><pre class="src"><code class="language-python">def true_buildings(label_path, level_prob):
+    &quot;&quot;&quot;Ground-truth buildings with the model&#x27;s damage level read from inside each true outline.&quot;&quot;&quot;
+    with open(label_path) as f:
+        label = json.load(f)
+    pixel_outlines = {feat[&quot;properties&quot;][&quot;uid&quot;]: parse_wkt_polygon(feat[&quot;wkt&quot;]) for feat in label[&quot;features&quot;][&quot;xy&quot;]}
+    predicted_level = np.argmax(level_prob, axis=0) + 1
+    result = []
+    for feat in label[&quot;features&quot;][&quot;lng_lat&quot;]:
+        props = feat[&quot;properties&quot;]
+        if props.get(&quot;subtype&quot;, &quot;un-classified&quot;) not in DAMAGE_NAMES:
+            continue
+        mask = np.zeros(predicted_level.shape, np.uint8)
+        cv2.fillPoly(mask, [np.round(pixel_outlines[props[&quot;uid&quot;]]).astype(np.int32)], 1)
+        votes = np.bincount(predicted_level[mask &gt; 0], minlength=5)[1:]
+        result.append({
+            &quot;damage&quot;: DAMAGE_NAMES.index(props[&quot;subtype&quot;]) + 1,
+            &quot;model_damage&quot;: int(votes.argmax()) + 1 if votes.sum() else None,
+            &quot;lnglat&quot;: parse_wkt_polygon(feat[&quot;wkt&quot;]),
+        })
+    return result</code></pre></div></div><div class="chunk-text">
+<p>For the expert-labelled buildings: their true level, and the level the model predicted inside the true outline
+(a mask of the outline, then a vote with <code>bincount</code>). The dashboard uses this for "model vs. true labels".</p></div></div><div class="chunk"><div class="chunk-code"><p class="where">lines 136–154</p><div class="code"><pre class="ln" aria-hidden="true">136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154</pre><pre class="src"><code class="language-python">def export(splits, damage_run=&quot;runs/damage_v3&quot;, disaster_prefix=&quot;hurricane&quot;):
+    device = train.pick_device()
+    loc_model, dmg_model = load_models(device, damage_run=damage_run)
+    (DASHBOARD / &quot;data&quot;).mkdir(parents=True, exist_ok=True)
+    (DASHBOARD / &quot;images&quot;).mkdir(parents=True, exist_ok=True)
+
+    features = defaultdict(list)
+    tiles = []
+    for split in splits:
+        processed = Path(&quot;data/processed&quot;) / split
+        masks = sorted(p for p in (processed / &quot;masks&quot;).glob(&quot;*.png&quot;) if p.stem.startswith(disaster_prefix))
+        for i, mask_path in enumerate(masks, 1):
+            tile_id = mask_path.stem
+            disaster = tile_id.rsplit(&quot;_&quot;, 1)[0]
+            pre = read_rgb(processed / &quot;images&quot; / f&quot;{tile_id}_pre.jpg&quot;)
+            post = read_rgb(processed / &quot;images&quot; / f&quot;{tile_id}_post.jpg&quot;)
+            building_prob, level_prob = predict_maps(loc_model, dmg_model, pre, post, device)
+            label_path = Path(&quot;data/xbd&quot;) / split / &quot;labels&quot; / f&quot;{tile_id}_post_disaster.json&quot;
+            to_lnglat = georeference(label_path, Path(&quot;data/xbd&quot;) / split / &quot;images&quot; / f&quot;{tile_id}_post_disaster.tif&quot;)</code></pre></div></div><div class="chunk-text"><p>The main loop: for each split and each hurricane tile, read the images, run both models, and get the tile's coordinate converter.</p></div></div><div class="chunk"><div class="chunk-code"><p class="where">lines 156–171</p><div class="code"><pre class="ln" aria-hidden="true">156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171</pre><pre class="src"><code class="language-python">            predicted = extract_buildings(building_prob, level_prob)
+            for b in predicted:
+                features[disaster].append({
+                    &quot;type&quot;: &quot;Feature&quot;,
+                    &quot;geometry&quot;: geojson_polygon(to_lnglat(b[&quot;outline&quot;])),
+                    &quot;properties&quot;: {&quot;source&quot;: &quot;predicted&quot;, &quot;tile&quot;: tile_id, &quot;damage&quot;: b[&quot;damage&quot;],
+                                   &quot;confidence&quot;: round(b[&quot;confidence&quot;], 3)},
+                })
+            truth = true_buildings(label_path, level_prob)
+            for b in truth:
+                features[disaster].append({
+                    &quot;type&quot;: &quot;Feature&quot;,
+                    &quot;geometry&quot;: geojson_polygon(b[&quot;lnglat&quot;]),
+                    &quot;properties&quot;: {&quot;source&quot;: &quot;true&quot;, &quot;tile&quot;: tile_id, &quot;damage&quot;: b[&quot;damage&quot;],
+                                   &quot;model_damage&quot;: b[&quot;model_damage&quot;]},
+                })</code></pre></div></div><div class="chunk-text"><p>Each predicted building and each true building becomes one GeoJSON <b>feature</b> (a shape plus properties: source, tile, damage level, confidence), grouped by disaster.</p></div></div><div class="chunk"><div class="chunk-code"><p class="where">lines 173–187</p><div class="code"><pre class="ln" aria-hidden="true">173
+174
+175
+176
+177
+178
+179
+180
+181
+182
+183
+184
+185
+186
+187</pre><pre class="src"><code class="language-python">            for phase, rgb in ((&quot;pre&quot;, pre), (&quot;post&quot;, post)):
+                small = cv2.resize(rgb, (512, 512), interpolation=cv2.INTER_AREA)
+                cv2.imwrite(str(DASHBOARD / &quot;images&quot; / f&quot;{tile_id}_{phase}.jpg&quot;),
+                            cv2.cvtColor(small, cv2.COLOR_RGB2BGR), [cv2.IMWRITE_JPEG_QUALITY, 85])
+            corners = to_lnglat(np.array([[0.0, 0.0], [1024.0, 1024.0]]))
+            tiles.append({
+                &quot;tile&quot;: tile_id,
+                &quot;disaster&quot;: disaster,
+                &quot;split&quot;: split,
+                &quot;bounds&quot;: [[corners[1, 1], corners[0, 0]], [corners[0, 1], corners[1, 0]]],  # [[south, west], [north, east]]
+                &quot;predicted&quot;: [sum(b[&quot;damage&quot;] == c for b in predicted) for c in range(1, 5)],
+                &quot;true&quot;: [sum(b[&quot;damage&quot;] == c for b in truth) for c in range(1, 5)],
+            })
+            if i % 50 == 0 or i == len(masks):
+                print(f&quot;{split}: {i}/{len(masks)} tiles&quot;, flush=True)</code></pre></div></div><div class="chunk-text">
+<p>Saves small 512 × 512 copies of both images for the map, and a summary of the tile: its corners as
+<code>[[south, west], [north, east]]</code> (the format Leaflet wants) and its building counts per level.</p></div></div><div class="chunk"><div class="chunk-code"><p class="where">lines 189–194</p><div class="code"><pre class="ln" aria-hidden="true">189
+190
+191
+192
+193
+194</pre><pre class="src"><code class="language-python">    for disaster, feats in features.items():
+        with open(DASHBOARD / &quot;data&quot; / f&quot;{disaster}.geojson&quot;, &quot;w&quot;) as f:
+            json.dump({&quot;type&quot;: &quot;FeatureCollection&quot;, &quot;features&quot;: feats}, f, separators=(&quot;,&quot;, &quot;:&quot;))
+    with open(DASHBOARD / &quot;data&quot; / &quot;tiles.json&quot;, &quot;w&quot;) as f:
+        json.dump({&quot;damage_names&quot;: DAMAGE_NAMES, &quot;tiles&quot;: tiles}, f, separators=(&quot;,&quot;, &quot;:&quot;))
+    print(f&quot;wrote {len(tiles)} tiles, disasters: {&#x27;, &#x27;.join(sorted(features))}&quot;)</code></pre></div></div><div class="chunk-text"><p>Writes one GeoJSON file per hurricane and one <code>tiles.json</code> index. <code>separators=(",", ":")</code> removes spaces to keep files smaller.</p></div></div><div class="chunk"><div class="chunk-code"><p class="where">lines 197–202</p><div class="code"><pre class="ln" aria-hidden="true">197
+198
+199
+200
+201
+202</pre><pre class="src"><code class="language-python">if __name__ == &quot;__main__&quot;:
+    parser = argparse.ArgumentParser(description=&quot;Export model predictions for the map dashboard.&quot;)
+    parser.add_argument(&quot;--splits&quot;, nargs=&quot;+&quot;, default=[&quot;hold&quot;, &quot;test&quot;])
+    parser.add_argument(&quot;--damage-run&quot;, default=&quot;runs/damage_v3&quot;, help=&quot;folder of the damage model to use&quot;)
+    args = parser.parse_args()
+    export(args.splits, args.damage_run)</code></pre></div></div><div class="chunk-text"><p>Options: which splits to export (default hold and test) and which damage model to use (default v3).</p></div></div></section><section class="file" id="src-evaluate-py"><h3><code>src/evaluate.py</code><span class="meta">62 lines</span></h3><p>The final, one-time evaluation on the test split, which was never used for any decision.</p><div class="chunk"><div class="chunk-code"><p class="where">lines 1–10</p><div class="code"><pre class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10</pre><pre class="src"><code class="language-python">&quot;&quot;&quot;Final evaluation of the trained models on the untouched test split.
+
+The hold split was used to choose the best epoch of every run, so its scores are slightly optimistic.
+The test split was never used for any decision; run this once at the end for the reported numbers.
+
+Usage (from the project root):
+
+    /opt/anaconda3/bin/python3 -m src.evaluate                  # test split -&gt; runs/test_results.json
+    /opt/anaconda3/bin/python3 -m src.evaluate --split hold     # same metrics on another split
+&quot;&quot;&quot;</code></pre></div></div><div class="chunk-text"><p>Docstring explaining why the test split exists: the hold split chose the best epochs, so its scores are slightly optimistic.</p></div></div><div class="chunk"><div class="chunk-code"><p class="where">lines 12–23</p><div class="code"><pre class="ln" aria-hidden="true">12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23</pre><pre class="src"><code class="language-python">import argparse
+import json
+from pathlib import Path
+
+import numpy as np
+import torch
+from torch.utils.data import DataLoader
+
+from src import damage, train
+from src.dataset import BuildingDataset
+
+DAMAGE_RUNS = {&quot;v1&quot;: &quot;runs/damage_resnet34&quot;, &quot;v3&quot;: &quot;runs/damage_v3&quot;}</code></pre></div></div><div class="chunk-text"><p>Imports and the two damage models to compare: v1 and the final v3.</p></div></div><div class="chunk"><div class="chunk-code"><p class="where">lines 26–29</p><div class="code"><pre class="ln" aria-hidden="true">26
+27
+28
+29</pre><pre class="src"><code class="language-python">def load(build, run_dir, device):
+    model = build(pretrained=False).to(device)
+    model.load_state_dict(torch.load(Path(run_dir) / &quot;best.pt&quot;, map_location=device)[&quot;model&quot;])
+    return model.eval()</code></pre></div></div><div class="chunk-text"><p>Builds a model with a given function and loads its best weights. Passing the function (<code>build</code>) as an argument lets one helper load both kinds of model.</p></div></div><div class="chunk"><div class="chunk-code"><p class="where">lines 32–40</p><div class="code"><pre class="ln" aria-hidden="true">32
+33
+34
+35
+36
+37
+38
+39
+40</pre><pre class="src"><code class="language-python">def main(split, data_root=&quot;data/processed&quot;, workers=4):
+    device = train.pick_device()
+    split_dir = Path(data_root) / split
+    results = {&quot;split&quot;: split}
+
+    loc_model = load(train.build_model, &quot;runs/loc_resnet34&quot;, device)
+    loc_loader = DataLoader(BuildingDataset([split_dir], crop=None, augment=False), batch_size=2, num_workers=workers)
+    results[&quot;localization&quot;] = train.evaluate(loc_model, loc_loader, device)
+    print(f&quot;localization: {results[&#x27;localization&#x27;]}&quot;, flush=True)</code></pre></div></div><div class="chunk-text"><p>Scores the localization model on all 933 test tiles with the same <code>evaluate</code> function used during training.</p></div></div><div class="chunk"><div class="chunk-code"><p class="where">lines 42–55</p><div class="code"><pre class="ln" aria-hidden="true">42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55</pre><pre class="src"><code class="language-python">    damage_ds = damage.DamageDataset([split_dir], crop=None, augment=False)
+    damage_loader = DataLoader(damage_ds, batch_size=2, num_workers=workers)
+    for name, run_dir in DAMAGE_RUNS.items():
+        model = load(damage.build_model, run_dir, device)
+        metrics = damage.evaluate(model, damage_loader, device)
+        matrix = damage.building_confusion(model, damage_ds, device)
+        metrics[&quot;building_accuracy&quot;] = float(np.trace(matrix) / matrix.sum())
+        metrics[&quot;building_confusion&quot;] = matrix.tolist()
+        results[f&quot;damage_{name}&quot;] = metrics
+        print(f&quot;damage {name}: &quot; + &quot;  &quot;.join(f&quot;{k}={v:.4f}&quot; for k, v in metrics.items() if isinstance(v, float)), flush=True)
+
+    out = Path(&quot;runs&quot;) / f&quot;{split}_results.json&quot;
+    out.write_text(json.dumps(results, indent=2))
+    print(f&quot;wrote {out}&quot;)</code></pre></div></div><div class="chunk-text"><p>For v1 and v3: pixel scores, the building-level confusion matrix, and building accuracy (the diagonal of the matrix divided by its total). Everything is saved to <code>runs/test_results.json</code>.</p></div></div><div class="chunk"><div class="chunk-code"><p class="where">lines 58–62</p><div class="code"><pre class="ln" aria-hidden="true">58
+59
+60
+61
+62</pre><pre class="src"><code class="language-python">if __name__ == &quot;__main__&quot;:
+    parser = argparse.ArgumentParser(description=&quot;Evaluate the trained models on a split.&quot;)
+    parser.add_argument(&quot;--split&quot;, default=&quot;test&quot;)
+    args = parser.parse_args()
+    main(args.split)</code></pre></div></div><div class="chunk-text"><p>Runs on <code>test</code> by default.</p></div></div></section><section class="file" id="src-check-georef-py"><h3><code>src/check_georef.py</code><span class="meta">110 lines</span></h3><p>Checks the coordinate error across the whole dataset: for every image, how far apart the GeoTIFF tags and the label coordinates place the same buildings.</p><div class="chunk"><div class="chunk-code"><p class="where">lines 1–17</p><div class="code"><pre class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17</pre><pre class="src"><code class="language-python">&quot;&quot;&quot;Compare the GeoTIFF georeferencing of every xBD image with the coordinates in its label file.
+
+Each label file lists every building twice: in pixel coordinates (&quot;xy&quot;) and in longitude/latitude
+(&quot;lng_lat&quot;). Fitting an affine transform between the two gives the georeferencing the labels use.
+This script compares it with the GeoTIFF tags (ModelTiepointTag + ModelPixelScaleTag) for every
+image, pre and post, in every split, and reports:
+
+    offset_median_m, offset_max_m   how far apart the two place the building corners, in metres
+    label_fit_max_m                 how exactly a single affine transform explains the labels
+    label_ratio, tif_ratio          degrees of longitude per degree of latitude for one pixel
+    expected_ratio                  1 / cos(latitude), the ratio for pixels that are square on the ground
+    label_px_m, tif_px_x_m/y_m      pixel size on the ground implied by each, in metres
+
+Usage (from the project root):
+
+    /opt/anaconda3/bin/python3 -m src.check_georef        # -&gt; outputs/georef_check.csv + summary
+&quot;&quot;&quot;</code></pre></div></div><div class="chunk-text"><p>Docstring listing every measured column.</p></div></div><div class="chunk"><div class="chunk-code"><p class="where">lines 19–32</p><div class="code"><pre class="ln" aria-hidden="true">19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32</pre><pre class="src"><code class="language-python">import json
+from multiprocessing import Pool
+from pathlib import Path
+
+import numpy as np
+import pandas as pd
+import tifffile
+
+from src.xbd import parse_wkt_polygon
+
+RAW_ROOT = Path(&quot;data/xbd&quot;)
+SPLITS = [&quot;tier1&quot;, &quot;tier3&quot;, &quot;hold&quot;, &quot;test&quot;]
+M_PER_DEG_LAT = 110_574.0
+M_PER_DEG_LON_EQUATOR = 111_320.0</code></pre></div></div><div class="chunk-text"><p>Constants: metres per degree of latitude (about 110.6 km everywhere) and of longitude at the equator (111.3 km, shrinking with the cosine of latitude).</p></div></div><div class="chunk"><div class="chunk-code"><p class="where">lines 35–48</p><div class="code"><pre class="ln" aria-hidden="true">35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48</pre><pre class="src"><code class="language-python">def check_image(label_path):
+    with open(label_path) as f:
+        features = json.load(f)[&quot;features&quot;]
+    pixel_outlines = {feat[&quot;properties&quot;][&quot;uid&quot;]: parse_wkt_polygon(feat[&quot;wkt&quot;]) for feat in features[&quot;xy&quot;]}
+    pixels, lnglats = [], []
+    for feat in features[&quot;lng_lat&quot;]:
+        xy, lnglat = pixel_outlines.get(feat[&quot;properties&quot;][&quot;uid&quot;]), parse_wkt_polygon(feat[&quot;wkt&quot;])
+        if xy is not None and len(xy) == len(lnglat):
+            pixels.append(xy)
+            lnglats.append(lnglat)
+    row = {&quot;image&quot;: label_path.stem, &quot;split&quot;: label_path.parent.parent.name,
+           &quot;disaster&quot;: label_path.stem.rsplit(&quot;_&quot;, 3)[0], &quot;buildings&quot;: len(pixels)}
+    if sum(len(p) for p in pixels) &lt; 3:
+        return row</code></pre></div></div><div class="chunk-text"><p>For one label file: pair pixel outlines with longitude/latitude outlines by building id, as in <code>predict.py</code>. Images without buildings cannot be checked and return early.</p></div></div><div class="chunk"><div class="chunk-code"><p class="where">lines 50–58</p><div class="code"><pre class="ln" aria-hidden="true">50
+51
+52
+53
+54
+55
+56
+57
+58</pre><pre class="src"><code class="language-python">    pixels, lnglats = np.vstack(pixels), np.vstack(lnglats)
+    lat = lnglats[:, 1].mean()
+    m_per_deg_lon = M_PER_DEG_LON_EQUATOR * np.cos(np.radians(lat))
+
+    def metres(d_lnglat):
+        return np.hypot(d_lnglat[:, 0] * m_per_deg_lon, d_lnglat[:, 1] * M_PER_DEG_LAT)
+
+    design = np.column_stack([pixels, np.ones(len(pixels))])
+    coef = np.linalg.lstsq(design, lnglats, rcond=None)[0]  # rows: x, y, 1 ; columns: lon, lat</code></pre></div></div><div class="chunk-text">
+<p><code>metres()</code> converts differences in degrees to metres: longitude differences are multiplied by
+111,320 × cos(latitude), latitude differences by 110,574, and <code>hypot</code> gives the straight-line distance.
+Then the same least-squares affine fit as in <code>predict.py</code>.</p></div></div><div class="chunk"><div class="chunk-code"><p class="where">lines 60–66</p><div class="code"><pre class="ln" aria-hidden="true">60
+61
+62
+63
+64
+65
+66</pre><pre class="src"><code class="language-python">    tif_path = label_path.parent.parent / &quot;images&quot; / f&quot;{label_path.stem}.tif&quot;
+    with tifffile.TiffFile(tif_path) as tif:
+        tags = tif.pages[0].tags
+        scale_x, scale_y = tags[&quot;ModelPixelScaleTag&quot;].value[:2]
+        lon0, lat0 = tags[&quot;ModelTiepointTag&quot;].value[3:5]
+    tif_lnglat = np.column_stack([lon0 + pixels[:, 0] * scale_x, lat0 - pixels[:, 1] * scale_y])
+    offset = metres(tif_lnglat - lnglats)</code></pre></div></div><div class="chunk-text"><p>Reads the GeoTIFF tags (top-left corner and pixel size in degrees), places every building corner with them, and measures the distance to the label position in metres.</p></div></div><div class="chunk"><div class="chunk-code"><p class="where">lines 68–81</p><div class="code"><pre class="ln" aria-hidden="true">68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81</pre><pre class="src"><code class="language-python">    row.update({
+        &quot;lat&quot;: lat,
+        &quot;offset_median_m&quot;: float(np.median(offset)),
+        &quot;offset_max_m&quot;: float(offset.max()),
+        &quot;label_fit_max_m&quot;: float(metres(design @ coef - lnglats).max()),
+        &quot;label_ratio&quot;: float(abs(coef[0, 0] / coef[1, 1])),
+        &quot;tif_ratio&quot;: float(scale_x / scale_y),
+        &quot;expected_ratio&quot;: float(1 / np.cos(np.radians(lat))),
+        &quot;label_rotation&quot;: float(np.hypot(coef[1, 0], coef[0, 1]) / np.hypot(coef[0, 0], coef[1, 1])),
+        &quot;label_px_m&quot;: float(abs(coef[1, 1]) * M_PER_DEG_LAT),
+        &quot;tif_px_x_m&quot;: float(scale_x * m_per_deg_lon),
+        &quot;tif_px_y_m&quot;: float(scale_y * M_PER_DEG_LAT),
+    })
+    return row</code></pre></div></div><div class="chunk-text">
+<p>Records the results, including the key test: <code>label_ratio</code> (degrees of longitude per degree of latitude
+for one pixel, from the labels), <code>tif_ratio</code> (always exactly 1.0) and <code>expected_ratio</code> = 1 / cos(latitude),
+the ratio for pixels that are square on the ground. The labels match the expected ratio; the tags do not.</p></div></div><div class="chunk"><div class="chunk-code"><p class="where">lines 84–110</p><div class="code"><pre class="ln" aria-hidden="true">84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110</pre><pre class="src"><code class="language-python">def main():
+    labels = [p for split in SPLITS for p in sorted((RAW_ROOT / split / &quot;labels&quot;).glob(&quot;*.json&quot;))]
+    with Pool() as pool:
+        rows = pool.map(check_image, labels, chunksize=64)
+    df = pd.DataFrame(rows)
+    out = Path(&quot;outputs/georef_check.csv&quot;)
+    df.to_csv(out, index=False)
+
+    checked = df.dropna(subset=[&quot;offset_median_m&quot;])
+    print(f&quot;images: {len(df):,}  with buildings (checked): {len(checked):,}  -&gt; {out}\n&quot;)
+    print(&quot;offset between GeoTIFF tags and label coordinates (median per image, metres):&quot;)
+    print(checked.offset_median_m.describe(percentiles=[0.05, 0.25, 0.5, 0.75, 0.95]).round(2).to_string(), &quot;\n&quot;)
+    print(f&quot;images with median offset &gt; 5 m: {(checked.offset_median_m &gt; 5).mean():.1%}   &gt; 10 m: {(checked.offset_median_m &gt; 10).mean():.1%}&quot;)
+    print(f&quot;label transform fits within 0.1 m: {(checked.label_fit_max_m &lt; 0.1).mean():.1%}   max rotation term: {checked.label_rotation.max():.2e}&quot;)
+    print(f&quot;label ratio / expected ratio: median {np.median(checked.label_ratio / checked.expected_ratio):.4f}  &quot;
+          f&quot;(5-95%: {np.percentile(checked.label_ratio / checked.expected_ratio, 5):.4f}-{np.percentile(checked.label_ratio / checked.expected_ratio, 95):.4f})&quot;)
+    print(f&quot;tif ratio: min {checked.tif_ratio.min():.4f}  max {checked.tif_ratio.max():.4f}\n&quot;)
+    by = checked.groupby(&quot;disaster&quot;).agg(images=(&quot;image&quot;, &quot;size&quot;), lat=(&quot;lat&quot;, &quot;mean&quot;),
+                                         offset_median_m=(&quot;offset_median_m&quot;, &quot;median&quot;),
+                                         offset_max_m=(&quot;offset_max_m&quot;, &quot;max&quot;),
+                                         label_px_m=(&quot;label_px_m&quot;, &quot;median&quot;),
+                                         tif_px_x_m=(&quot;tif_px_x_m&quot;, &quot;median&quot;), tif_px_y_m=(&quot;tif_px_y_m&quot;, &quot;median&quot;))
+    print(by.sort_values(&quot;offset_median_m&quot;).round(2).to_string())
+
+
+if __name__ == &quot;__main__&quot;:
+    main()</code></pre></div></div><div class="chunk-text"><p>Checks all 22,068 label files in parallel (under a minute), saves <code>outputs/georef_check.csv</code>, and prints the summary and the table by disaster.</p></div></div></section><section class="file" id="src-validate-osm-py"><h3><code>src/validate_osm.py</code><span class="meta">217 lines</span></h3><p>An independent check of the coordinate finding: compare xBD buildings with OpenStreetMap (OSM) buildings, which volunteers traced on other imagery.</p><div class="chunk"><div class="chunk-code"><p class="where">lines 1–22</p><div class="code"><pre class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22</pre><pre class="src"><code class="language-python">&quot;&quot;&quot;Validate xBD georeferencing against OpenStreetMap building footprints.
+
+OSM buildings are traced independently of xBD, on other imagery. For a sample of tiles, this
+script downloads the OSM buildings around each tile (cached in data/osm/) and places every xBD
+building two ways:
+
+    label   using the longitude/latitude in the xBD label file
+    tif     using the GeoTIFF tags (tiepoint + pixel size)
+
+and measures for each way:
+
+    hit_rate       share of xBD building centres that fall inside an OSM building
+    median_dist_m  median distance from an xBD building centre to the nearest OSM building (0 inside)
+
+It also searches for the translation (up to ±40 m) that best aligns the label positions with OSM;
+if the labels are correct this shift should be close to zero.
+
+Usage (from the project root; the first run downloads OSM data, about 20 minutes):
+
+    /opt/anaconda3/bin/python3 -m src.validate_osm               # -&gt; outputs/osm_validation.csv
+    /opt/anaconda3/bin/python3 -m src.validate_osm --per-disaster 5
+&quot;&quot;&quot;</code></pre></div></div><div class="chunk-text"><p>Docstring with the measured quantities.</p></div></div><div class="chunk"><div class="chunk-code"><p class="where">lines 24–47</p><div class="code"><pre class="ln" aria-hidden="true">24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47</pre><pre class="src"><code class="language-python">import argparse
+import json
+import random
+import time
+from pathlib import Path
+
+import numpy as np
+import pandas as pd
+import requests
+import shapely
+import tifffile
+
+from src.xbd import parse_wkt_polygon
+
+RAW_ROOT = Path(&quot;data/xbd&quot;)
+OSM_CACHE = Path(&quot;data/osm&quot;)
+SPLITS = [&quot;tier1&quot;, &quot;tier3&quot;, &quot;hold&quot;, &quot;test&quot;]
+DISASTERS = [&quot;palu-tsunami&quot;, &quot;hurricane-matthew&quot;, &quot;hurricane-harvey&quot;, &quot;hurricane-michael&quot;,
+             &quot;hurricane-florence&quot;, &quot;joplin-tornado&quot;, &quot;santa-rosa-wildfire&quot;]
+OVERPASS = &quot;https://overpass-api.de/api/interpreter&quot;
+USER_AGENT = &quot;xbd-georef-validation (academic project, contact via github.com/shahid12313/hurricane-damage-mapper)&quot;
+MARGIN_DEG = 0.001  # about 100 m around the tile, so shifted buildings are still covered
+MIN_BUILDINGS = 30
+SHIFTS_M = np.arange(-40, 41, 2)</code></pre></div></div><div class="chunk-text">
+<p><code>requests</code> downloads data from the internet; <code>shapely</code> does geometry (is a point inside a polygon,
+how far apart are two shapes). Seven disasters are sampled across latitudes, with Palu near the equator as a
+control. The 100 m margin makes sure shifted buildings are still inside the downloaded area.</p></div></div><div class="chunk"><div class="chunk-code"><p class="where">lines 50–67</p><div class="code"><pre class="ln" aria-hidden="true">50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67</pre><pre class="src"><code class="language-python">def sample_tiles(per_disaster, seed=0):
+    rng = random.Random(seed)
+    chosen = []
+    for disaster in DISASTERS:
+        candidates = []
+        for split in SPLITS:
+            for label in sorted((RAW_ROOT / split / &quot;labels&quot;).glob(f&quot;{disaster}_*_post_disaster.json&quot;)):
+                candidates.append(label)
+        rng.shuffle(candidates)
+        picked = []
+        for label in candidates:
+            with open(label) as f:
+                if len(json.load(f)[&quot;features&quot;][&quot;lng_lat&quot;]) &gt;= MIN_BUILDINGS:
+                    picked.append(label)
+            if len(picked) == per_disaster:
+                break
+        chosen += picked
+    return chosen</code></pre></div></div><div class="chunk-text"><p>Picks tiles with at least 30 buildings at random, but with a fixed <b>seed</b> (<code>Random(0)</code>), so the same tiles are chosen every run.</p></div></div><div class="chunk"><div class="chunk-code"><p class="where">lines 70–87</p><div class="code"><pre class="ln" aria-hidden="true">70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87</pre><pre class="src"><code class="language-python">def xbd_buildings(label_path):
+    &quot;&quot;&quot;Each building&#x27;s outline in lng/lat from the label, and from the GeoTIFF tags.&quot;&quot;&quot;
+    with open(label_path) as f:
+        features = json.load(f)[&quot;features&quot;]
+    pixel = {feat[&quot;properties&quot;][&quot;uid&quot;]: parse_wkt_polygon(feat[&quot;wkt&quot;]) for feat in features[&quot;xy&quot;]}
+    tif_path = label_path.parent.parent / &quot;images&quot; / f&quot;{label_path.stem}.tif&quot;
+    with tifffile.TiffFile(tif_path) as tif:
+        tags = tif.pages[0].tags
+        scale_x, scale_y = tags[&quot;ModelPixelScaleTag&quot;].value[:2]
+        lon0, lat0 = tags[&quot;ModelTiepointTag&quot;].value[3:5]
+    label_polys, tif_polys = [], []
+    for feat in features[&quot;lng_lat&quot;]:
+        xy = pixel.get(feat[&quot;properties&quot;][&quot;uid&quot;])
+        if xy is None:
+            continue
+        label_polys.append(parse_wkt_polygon(feat[&quot;wkt&quot;]))
+        tif_polys.append(np.column_stack([lon0 + xy[:, 0] * scale_x, lat0 - xy[:, 1] * scale_y]))
+    return label_polys, tif_polys</code></pre></div></div><div class="chunk-text"><p>Each building's outline placed two ways: from the label coordinates, and from the GeoTIFF tags.</p></div></div><div class="chunk"><div class="chunk-code"><p class="where">lines 90–112</p><div class="code"><pre class="ln" aria-hidden="true">90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112</pre><pre class="src"><code class="language-python">def fetch_osm(tile, bbox):
+    &quot;&quot;&quot;OSM building ways inside bbox (south, west, north, east), cached per tile.&quot;&quot;&quot;
+    OSM_CACHE.mkdir(parents=True, exist_ok=True)
+    cache = OSM_CACHE / f&quot;{tile}.json&quot;
+    if cache.exists():
+        return json.loads(cache.read_text())
+    south, west, north, east = bbox
+    query = f&#x27;[out:json][timeout:60];way[&quot;building&quot;]({south},{west},{north},{east});out geom;&#x27;
+    problem = None
+    for attempt in range(6):
+        try:
+            response = requests.post(OVERPASS, data={&quot;data&quot;: query}, headers={&quot;User-Agent&quot;: USER_AGENT}, timeout=240)
+            if response.status_code == 200:
+                elements = response.json()[&quot;elements&quot;]
+                cache.write_text(json.dumps(elements))
+                time.sleep(2)  # be polite to the public server
+                return elements
+            problem = f&quot;HTTP {response.status_code}&quot;
+        except requests.RequestException as error:  # the public server is often slow or busy
+            problem = type(error).__name__
+        time.sleep(20 * (attempt + 1))
+    print(f&quot;  skipped {tile}: Overpass {problem}&quot;, flush=True)
+    return None</code></pre></div></div><div class="chunk-text">
+<p>Downloads OSM buildings for a box through the <b>Overpass API</b>, a public query service. Results are cached in
+<code>data/osm/</code> so each tile is downloaded once. The server is often busy, so it retries up to 6 times with
+longer waits, and waits 2 seconds between requests to be polite. A tile that still fails is skipped, not crashed.</p></div></div><div class="chunk"><div class="chunk-code"><p class="where">lines 115–122</p><div class="code"><pre class="ln" aria-hidden="true">115
+116
+117
+118
+119
+120
+121
+122</pre><pre class="src"><code class="language-python">def to_metres(lnglat, origin):
+    lon_c, lat_c = origin
+    return np.column_stack([(lnglat[:, 0] - lon_c) * 111_320 * np.cos(np.radians(lat_c)),
+                            (lnglat[:, 1] - lat_c) * 110_574])
+
+
+def centres(polygons, origin):
+    return np.array([to_metres(p, origin).mean(axis=0) for p in polygons])</code></pre></div></div><div class="chunk-text"><p>Converts longitude/latitude to metres around the tile centre, so distances can be measured.</p></div></div><div class="chunk"><div class="chunk-code"><p class="where">lines 125–133</p><div class="code"><pre class="ln" aria-hidden="true">125
+126
+127
+128
+129
+130
+131
+132
+133</pre><pre class="src"><code class="language-python">def score(points, osm_polys, tree):
+    pts = shapely.points(points)
+    inside = np.zeros(len(points), bool)
+    inside[np.unique(tree.query(pts, predicate=&quot;within&quot;)[0])] = True
+    (point_idx, _), distances = tree.query_nearest(pts, return_distance=True)
+    dist = np.full(len(points), np.inf)
+    np.minimum.at(dist, point_idx, distances)  # a point can tie with several nearest buildings
+    dist[inside] = 0.0
+    return inside.mean(), float(np.median(dist))</code></pre></div></div><div class="chunk-text"><p>For a set of building centres: the share that fall inside an OSM building (<b>hit rate</b>) and the median distance to the nearest OSM building. An <code>STRtree</code> is a spatial index that makes these searches fast.</p></div></div><div class="chunk"><div class="chunk-code"><p class="where">lines 136–148</p><div class="code"><pre class="ln" aria-hidden="true">136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148</pre><pre class="src"><code class="language-python">def best_shift(points, tree):
+    &quot;&quot;&quot;Translation (in metres) that puts the most label building centres inside OSM buildings.&quot;&quot;&quot;
+    dx, dy = np.meshgrid(SHIFTS_M, SHIFTS_M)
+    shifts = np.column_stack([dx.ravel(), dy.ravel()])
+    moved = (points[None, :, :] + shifts[:, None, :]).reshape(-1, 2)
+    hits = np.zeros(len(moved), bool)
+    hits[np.unique(tree.query(shapely.points(moved), predicate=&quot;within&quot;)[0])] = True
+    counts = hits.reshape(len(shifts), len(points)).sum(axis=1)
+    best = counts.max()
+    # several shifts can tie; take the one closest to zero
+    tied = shifts[counts == best]
+    sx, sy = tied[np.argmin(np.hypot(tied[:, 0], tied[:, 1]))]
+    return float(sx), float(sy), int(best)</code></pre></div></div><div class="chunk-text"><p>Tries every shift of the label positions from −40 to +40 m in 2 m steps, and finds the one that puts the most centres inside OSM buildings. If the labels are right, the best shift should be small (a few metres, from OSM's own accuracy and roof lean).</p></div></div><div class="chunk"><div class="chunk-code"><p class="where">lines 151–181</p><div class="code"><pre class="ln" aria-hidden="true">151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180
+181</pre><pre class="src"><code class="language-python">def validate_tile(label_path):
+    tile = label_path.stem.replace(&quot;_post_disaster&quot;, &quot;&quot;)
+    label_polys, tif_polys = xbd_buildings(label_path)
+    all_pts = np.vstack(label_polys + tif_polys)
+    bbox = (all_pts[:, 1].min() - MARGIN_DEG, all_pts[:, 0].min() - MARGIN_DEG,
+            all_pts[:, 1].max() + MARGIN_DEG, all_pts[:, 0].max() + MARGIN_DEG)
+    elements = fetch_osm(tile, bbox)
+    origin = (all_pts[:, 0].mean(), all_pts[:, 1].mean())
+    if elements is None:
+        return {&quot;tile&quot;: tile, &quot;disaster&quot;: tile.rsplit(&quot;_&quot;, 1)[0], &quot;lat&quot;: origin[1], &quot;xbd_buildings&quot;: len(label_polys)}
+
+    osm_polys = []
+    for way in elements:
+        ring = np.array([[node[&quot;lon&quot;], node[&quot;lat&quot;]] for node in way.get(&quot;geometry&quot;, [])])
+        if len(ring) &gt;= 4:
+            poly = shapely.make_valid(shapely.Polygon(to_metres(ring, origin)))
+            if poly.area &gt; 1:
+                osm_polys.append(poly)
+    row = {&quot;tile&quot;: tile, &quot;disaster&quot;: tile.rsplit(&quot;_&quot;, 1)[0], &quot;lat&quot;: origin[1],
+           &quot;xbd_buildings&quot;: len(label_polys), &quot;osm_buildings&quot;: len(osm_polys)}
+    if len(osm_polys) &lt; 5:
+        return row
+
+    tree = shapely.STRtree(osm_polys)
+    label_pts, tif_pts = centres(label_polys, origin), centres(tif_polys, origin)
+    row[&quot;label_hit_rate&quot;], row[&quot;label_median_dist_m&quot;] = score(label_pts, osm_polys, tree)
+    row[&quot;tif_hit_rate&quot;], row[&quot;tif_median_dist_m&quot;] = score(tif_pts, osm_polys, tree)
+    row[&quot;best_shift_x_m&quot;], row[&quot;best_shift_y_m&quot;], _ = best_shift(label_pts, tree)
+    row[&quot;best_shift_m&quot;] = float(np.hypot(row[&quot;best_shift_x_m&quot;], row[&quot;best_shift_y_m&quot;]))
+    row[&quot;tif_vs_label_m&quot;] = float(np.median(np.hypot(*(tif_pts - label_pts).T)))
+    return row</code></pre></div></div><div class="chunk-text"><p>Puts it together for one tile: download OSM, build OSM polygons in metres, and score both placements.</p></div></div><div class="chunk"><div class="chunk-code"><p class="where">lines 184–217</p><div class="code"><pre class="ln" aria-hidden="true">184
+185
+186
+187
+188
+189
+190
+191
+192
+193
+194
+195
+196
+197
+198
+199
+200
+201
+202
+203
+204
+205
+206
+207
+208
+209
+210
+211
+212
+213
+214
+215
+216
+217</pre><pre class="src"><code class="language-python">def main(per_disaster):
+    tiles = sample_tiles(per_disaster)
+    print(f&quot;{len(tiles)} tiles sampled from {len(DISASTERS)} disasters&quot;, flush=True)
+    rows = []
+    for i, label in enumerate(tiles, 1):
+        rows.append(validate_tile(label))
+        if i % 20 == 0 or i == len(tiles):
+            print(f&quot;{i}/{len(tiles)} tiles&quot;, flush=True)
+    df = pd.DataFrame(rows)
+    out = Path(&quot;outputs/osm_validation.csv&quot;)
+    df.to_csv(out, index=False)
+
+    scored = df.dropna(subset=[&quot;label_hit_rate&quot;])
+    covered = scored[scored.osm_buildings &gt;= 0.5 * scored.xbd_buildings]
+    print(f&quot;\nwrote {out}: {len(df)} tiles, {len(scored)} with OSM buildings, &quot;
+          f&quot;{len(covered)} where OSM has at least half as many buildings as xBD\n&quot;)
+    for name, part in [(&quot;all tiles with OSM buildings&quot;, scored), (&quot;well-covered tiles&quot;, covered)]:
+        print(f&quot;{name}: hit rate label {part.label_hit_rate.mean():.1%} vs tif {part.tif_hit_rate.mean():.1%}; &quot;
+              f&quot;median distance label {part.label_median_dist_m.median():.1f} m vs tif {part.tif_median_dist_m.median():.1f} m; &quot;
+              f&quot;best label shift median {part.best_shift_m.median():.1f} m&quot;)
+    summary = covered.groupby(&quot;disaster&quot;).agg(
+        tiles=(&quot;tile&quot;, &quot;size&quot;), lat=(&quot;lat&quot;, &quot;mean&quot;), tif_vs_label_m=(&quot;tif_vs_label_m&quot;, &quot;median&quot;),
+        label_hit=(&quot;label_hit_rate&quot;, &quot;mean&quot;), tif_hit=(&quot;tif_hit_rate&quot;, &quot;mean&quot;),
+        label_dist_m=(&quot;label_median_dist_m&quot;, &quot;median&quot;), tif_dist_m=(&quot;tif_median_dist_m&quot;, &quot;median&quot;),
+        best_label_shift_m=(&quot;best_shift_m&quot;, &quot;median&quot;))
+    print(&quot;\nwell-covered tiles by disaster:&quot;)
+    print(summary.sort_values(&quot;lat&quot;, key=abs).round(2).to_string())
+
+
+if __name__ == &quot;__main__&quot;:
+    parser = argparse.ArgumentParser(description=&quot;Validate xBD georeferencing against OpenStreetMap buildings.&quot;)
+    parser.add_argument(&quot;--per-disaster&quot;, type=int, default=40)
+    args = parser.parse_args()
+    main(args.per_disaster)</code></pre></div></div><div class="chunk-text"><p>Runs all sampled tiles, saves <code>outputs/osm_validation.csv</code>, and prints the comparison overall, for well-covered tiles, and by disaster.</p></div></div></section><section class="file" id="src-progress-py"><h3><code>src/progress.py</code><span class="meta">73 lines</span></h3><p>The live progress display used during the overnight runs. It only reads files, so it cannot affect training.</p><div class="chunk"><div class="chunk-code"><p class="where">lines 1–12</p><div class="code"><pre class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12</pre><pre class="src"><code class="language-python">&quot;&quot;&quot;Live training progress for both phases, refreshed every 30 seconds.
+
+Usage (from the project root; Ctrl+C to stop watching, training keeps running):
+
+    /opt/anaconda3/bin/python3 -m src.progress
+&quot;&quot;&quot;
+
+import csv
+import subprocess
+import time
+from datetime import datetime, timedelta
+from pathlib import Path</code></pre></div></div><div class="chunk-text"><p>Docstring with the command.</p></div></div><div class="chunk"><div class="chunk-code"><p class="where">lines 14–21</p><div class="code"><pre class="ln" aria-hidden="true">14
+15
+16
+17
+18
+19
+20
+21</pre><pre class="src"><code class="language-python">DAMAGE_COLUMNS = [&quot;score&quot;, &quot;damage_f1&quot;, &quot;f1_minor-damage&quot;]
+RUNS = [
+    (&quot;Phase 2: find buildings&quot;, Path(&quot;runs/loc_resnet34&quot;), &quot;src.train&quot;, &quot;f1&quot;, [&quot;f1&quot;, &quot;precision&quot;, &quot;recall&quot;], 30),
+    (&quot;Phase 3: classify damage&quot;, Path(&quot;runs/damage_resnet34&quot;), &quot;src.damage&quot;, &quot;score&quot;, DAMAGE_COLUMNS, 30),
+    (&quot;Phase 3 v2: minor weight + tier3&quot;, Path(&quot;runs/damage_v2&quot;), &quot;src.damage&quot;, &quot;score&quot;, DAMAGE_COLUMNS, 25),
+    (&quot;Phase 3 v3: balanced weights, from v1&quot;, Path(&quot;runs/damage_v3&quot;), &quot;src.damage&quot;, &quot;score&quot;, DAMAGE_COLUMNS, 10),
+]
+BAR_WIDTH = 30</code></pre></div></div><div class="chunk-text"><p>The runs to show: title, folder, program, which score decides "best", which columns to print, and how many epochs the run has.</p></div></div><div class="chunk"><div class="chunk-code"><p class="where">lines 24–25</p><div class="code"><pre class="ln" aria-hidden="true">24
+25</pre><pre class="src"><code class="language-python">def is_running(module):
+    return subprocess.run([&quot;pgrep&quot;, &quot;-f&quot;, f&quot;python3 -m {module}&quot;], capture_output=True).returncode == 0</code></pre></div></div><div class="chunk-text"><p>Asks the operating system whether a matching process exists, with the <code>pgrep</code> command.</p></div></div><div class="chunk"><div class="chunk-code"><p class="where">lines 28–33</p><div class="code"><pre class="ln" aria-hidden="true">28
+29
+30
+31
+32
+33</pre><pre class="src"><code class="language-python">def read_history(run_dir):
+    path = run_dir / &quot;history.csv&quot;
+    if not path.exists():
+        return []
+    with open(path) as f:
+        return list(csv.DictReader(f))</code></pre></div></div><div class="chunk-text"><p>Reads a run's <code>history.csv</code> into a list of rows.</p></div></div><div class="chunk"><div class="chunk-code"><p class="where">lines 36–57</p><div class="code"><pre class="ln" aria-hidden="true">36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57</pre><pre class="src"><code class="language-python">def show_run(title, run_dir, module, best_key, columns, epochs):
+    rows = read_history(run_dir)
+    running = is_running(f&quot;{module} --out-dir {run_dir}&quot;) or (module == &quot;src.train&quot; and is_running(module))
+    done = len(rows)
+    status = &quot;running&quot; if running else (&quot;finished&quot; if done &gt;= epochs else (&quot;waiting&quot; if done == 0 else &quot;stopped&quot;))
+
+    filled = BAR_WIDTH * done // epochs
+    print(f&quot;\n{title}  [{status}]&quot;)
+    print(f&quot;  [{&#x27;#&#x27; * filled}{&#x27;.&#x27; * (BAR_WIDTH - filled)}] epoch {done}/{epochs}&quot;)
+    if not rows:
+        return
+
+    last = rows[-1]
+    best = max(rows, key=lambda r: float(r[best_key]))
+    print(&quot;  latest: &quot; + &quot;  &quot;.join(f&quot;{c}={float(last[c]):.3f}&quot; for c in columns))
+    print(f&quot;  best {best_key}: {float(best[best_key]):.3f} (epoch {best[&#x27;epoch&#x27;]})&quot;)
+
+    minutes = [float(r[&quot;minutes&quot;]) for r in rows]
+    per_epoch = sum(minutes[-5:]) / len(minutes[-5:])
+    if running and done &lt; epochs:
+        finish = datetime.now() + timedelta(minutes=per_epoch * (epochs - done))
+        print(f&quot;  ~{per_epoch:.1f} min/epoch, expected to finish around {finish:%H:%M}&quot;)</code></pre></div></div><div class="chunk-text"><p>Prints the status, a progress bar of <code>#</code> characters, the latest and best scores, and an estimated finish time from the average of the last 5 epochs.</p></div></div><div class="chunk"><div class="chunk-code"><p class="where">lines 60–73</p><div class="code"><pre class="ln" aria-hidden="true">60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73</pre><pre class="src"><code class="language-python">def main():
+    try:
+        while True:
+            print(&quot;\033[2J\033[H&quot;, end=&quot;&quot;)  # clear the terminal
+            print(f&quot;Training progress  (updated {datetime.now():%H:%M:%S}, Ctrl+C to stop watching)&quot;)
+            for run in RUNS:
+                show_run(*run)
+            time.sleep(30)
+    except KeyboardInterrupt:
+        print()
+
+
+if __name__ == &quot;__main__&quot;:
+    main()</code></pre></div></div><div class="chunk-text"><p>Clears the screen with a terminal control code, prints every run, waits 30 seconds, repeats. Ctrl+C raises <code>KeyboardInterrupt</code>, which ends the loop quietly.</p></div></div></section><section class="file" id="dashboard-index-html"><h3><code>dashboard/index.html</code><span class="meta">299 lines</span></h3><p>The map: one web page using <b>Leaflet</b>, an open-source map library. It reads the files written by <code>predict.py</code>. It needs a small web server (<code>python -m http.server</code>) because browsers do not let pages opened straight from disk load data files.</p><div class="chunk"><div class="chunk-code"><p class="where">lines 1–8</p><div class="code"><pre class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8</pre><pre class="src"><code class="language-javascript">&lt;!doctype html&gt;
+&lt;html lang=&quot;en&quot;&gt;
+&lt;head&gt;
+&lt;meta charset=&quot;utf-8&quot;&gt;
+&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1&quot;&gt;
+&lt;title&gt;Hurricane Damage Mapper&lt;/title&gt;
+&lt;link rel=&quot;stylesheet&quot; href=&quot;https://unpkg.com/leaflet@1.9.4/dist/leaflet.css&quot;&gt;
+&lt;script src=&quot;https://unpkg.com/leaflet@1.9.4/dist/leaflet.js&quot;&gt;&lt;/script&gt;</code></pre></div></div><div class="chunk-text"><p>The page header: title, and Leaflet's stylesheet and script loaded from a public CDN (a server that hosts common libraries).</p></div></div><div class="chunk"><div class="chunk-code"><p class="where">lines 9–69</p><details class="long"><summary>Show lines 9–69 (61 lines)</summary><div class="code"><pre class="ln" aria-hidden="true">9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69</pre><pre class="src"><code class="language-javascript">&lt;style&gt;
+  :root {
+    --bg: #ffffff;
+    --panel: #f6f7f9;
+    --text: #1d2330;
+    --muted: #5b6475;
+    --border: #dde1e8;
+    --accent: #1f5fbf;
+    --no-damage: #2ca02c;
+    --minor-damage: #f2c14e;
+    --major-damage: #f28e2b;
+    --destroyed: #d62728;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #15181e;
+      --panel: #1d2129;
+      --text: #e6e9ef;
+      --muted: #9aa3b2;
+      --border: #2e3440;
+      --accent: #6aa3ff;
+    }
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: var(--bg); color: var(--text);
+    font: 14px/1.45 -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto, sans-serif; }
+  .app { display: flex; height: 100%; }
+  aside { width: 340px; flex-shrink: 0; overflow-y: auto; border-right: 1px solid var(--border); padding: 16px; }
+  #map { flex: 1; }
+  h1 { font-size: 18px; margin: 0 0 2px; }
+  .sub { color: var(--muted); font-size: 12.5px; margin-bottom: 16px; }
+  section { background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 12px; margin-bottom: 12px; }
+  h2 { font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); margin: 0 0 8px; }
+  select { width: 100%; padding: 7px 8px; border-radius: 6px; border: 1px solid var(--border);
+    background: var(--bg); color: var(--text); font: inherit; }
+  .seg { display: flex; border: 1px solid var(--border); border-radius: 6px; overflow: hidden; margin-bottom: 8px; }
+  .seg button { flex: 1; padding: 6px 4px; border: 0; background: var(--bg); color: var(--text); font: inherit; font-size: 12.5px; cursor: pointer; }
+  .seg button + button { border-left: 1px solid var(--border); }
+  .seg button.on { background: var(--accent); color: #fff; }
+  .row { display: flex; align-items: center; gap: 8px; padding: 3px 0; }
+  .row label { display: flex; align-items: center; gap: 8px; flex: 1; cursor: pointer; }
+  .swatch { width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0; }
+  .count { font-variant-numeric: tabular-nums; color: var(--muted); }
+  .bar { height: 4px; border-radius: 2px; margin: 0 0 4px 20px; }
+  .stat { font-size: 22px; font-weight: 600; font-variant-numeric: tabular-nums; }
+  .note { color: var(--muted); font-size: 12px; margin-top: 6px; }
+  ol { margin: 0; padding-left: 20px; }
+  ol li { padding: 3px 0; cursor: pointer; }
+  ol li:hover { color: var(--accent); }
+  ol .tile-name { font-size: 12.5px; }
+  .pill { display: inline-block; font-size: 11px; padding: 0 6px; border-radius: 9px; color: #fff; margin-left: 4px; font-variant-numeric: tabular-nums; }
+  .leaflet-popup-content { font-size: 13px; }
+  .loading { position: absolute; z-index: 1000; top: 12px; left: 50%; transform: translateX(-50%);
+    background: var(--panel); color: var(--text); border: 1px solid var(--border); border-radius: 6px; padding: 6px 12px; display: none; }
+  @media (max-width: 760px) {
+    .app { flex-direction: column-reverse; }
+    aside { width: 100%; height: 45%; border-right: 0; border-top: 1px solid var(--border); }
+    #map { min-height: 55%; }
+  }
+&lt;/style&gt;
+&lt;/head&gt;</code></pre></div></details></div><div class="chunk-text"><p>The page's CSS (styling). Colours are defined once as variables (<code>--bg</code>, <code>--destroyed</code>, …) and redefined for dark mode. The damage colours are the same as in every Python figure. The last rule stacks the sidebar under the map on narrow screens.</p></div></div><div class="chunk"><div class="chunk-code"><p class="where">lines 70–115</p><details class="long"><summary>Show lines 70–115 (46 lines)</summary><div class="code"><pre class="ln" aria-hidden="true">70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115</pre><pre class="src"><code class="language-javascript">&lt;body&gt;
+&lt;div class=&quot;app&quot;&gt;
+  &lt;aside&gt;
+    &lt;h1&gt;Hurricane Damage Mapper&lt;/h1&gt;
+    &lt;div class=&quot;sub&quot;&gt;Building damage predicted from before/after satellite images (xBD validation and test tiles).&lt;/div&gt;
+
+    &lt;section&gt;
+      &lt;h2&gt;Disaster&lt;/h2&gt;
+      &lt;select id=&quot;disaster&quot;&gt;&lt;/select&gt;
+    &lt;/section&gt;
+
+    &lt;section&gt;
+      &lt;h2&gt;Buildings&lt;/h2&gt;
+      &lt;div class=&quot;seg&quot; id=&quot;source&quot;&gt;
+        &lt;button data-v=&quot;predicted&quot; class=&quot;on&quot;&gt;Model prediction&lt;/button&gt;
+        &lt;button data-v=&quot;true&quot;&gt;True labels&lt;/button&gt;
+      &lt;/div&gt;
+      &lt;div id=&quot;levels&quot;&gt;&lt;/div&gt;
+      &lt;div class=&quot;note&quot; id=&quot;source-note&quot;&gt;&lt;/div&gt;
+    &lt;/section&gt;
+
+    &lt;section&gt;
+      &lt;h2&gt;Satellite image&lt;/h2&gt;
+      &lt;div class=&quot;seg&quot; id=&quot;imagery&quot;&gt;
+        &lt;button data-v=&quot;post&quot; class=&quot;on&quot;&gt;After&lt;/button&gt;
+        &lt;button data-v=&quot;pre&quot;&gt;Before&lt;/button&gt;
+        &lt;button data-v=&quot;none&quot;&gt;Basemap only&lt;/button&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;note&quot;&gt;Tile images appear when you zoom in.&lt;/div&gt;
+    &lt;/section&gt;
+
+    &lt;section&gt;
+      &lt;h2&gt;Model vs. true labels&lt;/h2&gt;
+      &lt;div class=&quot;stat&quot; id=&quot;agreement&quot;&gt;–&lt;/div&gt;
+      &lt;div class=&quot;note&quot;&gt;Share of labeled buildings in this disaster where the model gave the same damage level.&lt;/div&gt;
+    &lt;/section&gt;
+
+    &lt;section&gt;
+      &lt;h2&gt;Hardest-hit areas&lt;/h2&gt;
+      &lt;ol id=&quot;priority&quot;&gt;&lt;/ol&gt;
+      &lt;div class=&quot;note&quot;&gt;Tiles ranked by predicted destroyed and major-damage buildings. Click one to zoom in.&lt;/div&gt;
+    &lt;/section&gt;
+  &lt;/aside&gt;
+  &lt;div id=&quot;map&quot;&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;loading&quot; id=&quot;loading&quot;&gt;Loading…&lt;/div&gt;</code></pre></div></details></div><div class="chunk-text"><p>The page structure: a sidebar with the disaster menu, the prediction/labels switch, the before/after switch, the agreement score and the hardest-hit list, and an empty <code>div</code> where Leaflet draws the map.</p></div></div><div class="chunk"><div class="chunk-code"><p class="where">line 117</p><div class="code"><pre class="ln" aria-hidden="true">117</pre><pre class="src"><code class="language-javascript">&lt;script&gt;</code></pre></div></div><div class="chunk-text"><p>Start of the JavaScript program.</p></div></div><div class="chunk"><div class="chunk-code"><p class="where">lines 118–137</p><div class="code"><pre class="ln" aria-hidden="true">118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137</pre><pre class="src"><code class="language-javascript">const LEVELS = [
+  { id: 1, key: &quot;no-damage&quot;, name: &quot;No damage&quot; },
+  { id: 2, key: &quot;minor-damage&quot;, name: &quot;Minor damage&quot; },
+  { id: 3, key: &quot;major-damage&quot;, name: &quot;Major damage&quot; },
+  { id: 4, key: &quot;destroyed&quot;, name: &quot;Destroyed&quot; },
+];
+const css = getComputedStyle(document.documentElement);
+const COLOR = Object.fromEntries(LEVELS.map(l =&gt; [l.id, css.getPropertyValue(&quot;--&quot; + l.key).trim()]));
+const DISASTER_LABELS = {
+  &quot;hurricane-harvey&quot;: &quot;Hurricane Harvey (Texas, 2017)&quot;,
+  &quot;hurricane-florence&quot;: &quot;Hurricane Florence (Carolinas, 2018)&quot;,
+  &quot;hurricane-michael&quot;: &quot;Hurricane Michael (Florida, 2018)&quot;,
+  &quot;hurricane-matthew&quot;: &quot;Hurricane Matthew (Haiti, 2016)&quot;,
+};
+const IMAGE_MIN_ZOOM = 15;
+
+const state = { disaster: null, source: &quot;predicted&quot;, imagery: &quot;post&quot;, visible: new Set([1, 2, 3, 4]) };
+let tiles = [], features = [], buildingLayer = null, tileLayer = null;
+const overlays = new Map();
+const cache = {};</code></pre></div></div><div class="chunk-text">
+<p>The four damage levels; colours read from the CSS variables so they always match; readable disaster names; the
+zoom level at which tile images appear (15). <code>state</code> holds what the user selected. <code>overlays</code> keeps the
+tile images currently on the map; <code>cache</code> keeps downloaded GeoJSON so switching back is instant.</p></div></div><div class="chunk"><div class="chunk-code"><p class="where">lines 139–147</p><div class="code"><pre class="ln" aria-hidden="true">139
+140
+141
+142
+143
+144
+145
+146
+147</pre><pre class="src"><code class="language-javascript">const map = L.map(&quot;map&quot;, { preferCanvas: true, zoomControl: true });
+const satellite = L.tileLayer(&quot;https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}&quot;, {
+  maxZoom: 20, maxNativeZoom: 19, attribution: &quot;Basemap © Esri, Maxar, Earthstar Geographics&quot;,
+}).addTo(map);
+const streets = L.tileLayer(&quot;https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png&quot;, {
+  maxZoom: 20, maxNativeZoom: 19, attribution: &quot;© OpenStreetMap contributors&quot;,
+});
+L.control.layers({ &quot;Satellite&quot;: satellite, &quot;Streets&quot;: streets }, null, { position: &quot;topright&quot; }).addTo(map);
+L.control.scale({ imperial: false }).addTo(map);</code></pre></div></div><div class="chunk-text"><p>Creates the map. <code>preferCanvas: true</code> draws buildings on one canvas instead of thousands of separate elements, which keeps it smooth with over 10,000 buildings. Two base layers (Esri satellite, OpenStreetMap streets), a layer switcher and a scale bar.</p></div></div><div class="chunk"><div class="chunk-code"><p class="where">lines 149–158</p><div class="code"><pre class="ln" aria-hidden="true">149
+150
+151
+152
+153
+154
+155
+156
+157
+158</pre><pre class="src"><code class="language-javascript">function setSegment(id, value) {
+  document.querySelectorAll(`#${id} button`).forEach(b =&gt; b.classList.toggle(&quot;on&quot;, b.dataset.v === value));
+}
+
+function bindSegment(id, onChange) {
+  document.querySelectorAll(`#${id} button`).forEach(b =&gt; b.addEventListener(&quot;click&quot;, () =&gt; {
+    setSegment(id, b.dataset.v);
+    onChange(b.dataset.v);
+  }));
+}</code></pre></div></div><div class="chunk-text"><p>Helpers for the button groups: highlight the chosen button, and run a function when one is clicked.</p></div></div><div class="chunk"><div class="chunk-code"><p class="where">lines 160–167</p><div class="code"><pre class="ln" aria-hidden="true">160
+161
+162
+163
+164
+165
+166
+167</pre><pre class="src"><code class="language-javascript">async function loadDisaster(name) {
+  if (!cache[name]) {
+    document.getElementById(&quot;loading&quot;).style.display = &quot;block&quot;;
+    cache[name] = (await (await fetch(`data/${name}.geojson`)).json()).features;
+    document.getElementById(&quot;loading&quot;).style.display = &quot;none&quot;;
+  }
+  return cache[name];
+}</code></pre></div></div><div class="chunk-text"><p>Downloads one hurricane's GeoJSON the first time it is needed, showing "Loading…". <code>async</code>/<code>await</code> lets the page wait for the download without freezing.</p></div></div><div class="chunk"><div class="chunk-code"><p class="where">lines 169–177</p><div class="code"><pre class="ln" aria-hidden="true">169
+170
+171
+172
+173
+174
+175
+176
+177</pre><pre class="src"><code class="language-javascript">function popupFor(p) {
+  const level = id =&gt; LEVELS[id - 1].name;
+  if (p.source === &quot;predicted&quot;) {
+    return `&lt;b&gt;Predicted: ${level(p.damage)}&lt;/b&gt;&lt;br&gt;Confidence ${(p.confidence * 100).toFixed(0)}%&lt;br&gt;&lt;span style=&quot;color:#888&quot;&gt;${p.tile}&lt;/span&gt;`;
+  }
+  const said = p.model_damage ? level(p.model_damage) : &quot;no prediction&quot;;
+  const match = p.model_damage === p.damage ? &quot;✓ matches&quot; : &quot;✗ differs&quot;;
+  return `&lt;b&gt;Labeled: ${level(p.damage)}&lt;/b&gt;&lt;br&gt;Model said: ${said} (${match})&lt;br&gt;&lt;span style=&quot;color:#888&quot;&gt;${p.tile}&lt;/span&gt;`;
+}</code></pre></div></div><div class="chunk-text"><p>The text shown when a building is clicked: predicted level and confidence, or for a labelled building, whether the model agreed.</p></div></div><div class="chunk"><div class="chunk-code"><p class="where">lines 179–187</p><div class="code"><pre class="ln" aria-hidden="true">179
+180
+181
+182
+183
+184
+185
+186
+187</pre><pre class="src"><code class="language-javascript">function drawBuildings() {
+  if (buildingLayer) buildingLayer.remove();
+  const shown = features.filter(f =&gt; f.properties.source === state.source &amp;&amp; state.visible.has(f.properties.damage));
+  buildingLayer = L.geoJSON(shown, {
+    style: f =&gt; ({ color: COLOR[f.properties.damage], weight: 1.5, fillColor: COLOR[f.properties.damage], fillOpacity: 0.45 }),
+    onEachFeature: (f, layer) =&gt; layer.bindPopup(popupFor(f.properties)),
+  }).addTo(map);
+  drawLevelCounts();
+}</code></pre></div></div><div class="chunk-text"><p>Removes the old buildings layer and draws the buildings of the chosen source and checked levels, each coloured by level with a popup.</p></div></div><div class="chunk"><div class="chunk-code"><p class="where">lines 189–207</p><div class="code"><pre class="ln" aria-hidden="true">189
+190
+191
+192
+193
+194
+195
+196
+197
+198
+199
+200
+201
+202
+203
+204
+205
+206
+207</pre><pre class="src"><code class="language-javascript">function drawLevelCounts() {
+  const counts = [0, 0, 0, 0];
+  features.forEach(f =&gt; { if (f.properties.source === state.source) counts[f.properties.damage - 1]++; });
+  const max = Math.max(...counts, 1);
+  document.getElementById(&quot;levels&quot;).innerHTML = LEVELS.map((l, i) =&gt; `
+    &lt;div class=&quot;row&quot;&gt;&lt;label&gt;
+      &lt;input type=&quot;checkbox&quot; data-level=&quot;${l.id}&quot; ${state.visible.has(l.id) ? &quot;checked&quot; : &quot;&quot;}&gt;
+      &lt;span class=&quot;swatch&quot; style=&quot;background:${COLOR[l.id]}&quot;&gt;&lt;/span&gt;${l.name}
+    &lt;/label&gt;&lt;span class=&quot;count&quot;&gt;${counts[i].toLocaleString()}&lt;/span&gt;&lt;/div&gt;
+    &lt;div class=&quot;bar&quot; style=&quot;width:calc((100% - 20px) * ${counts[i] / max});background:${COLOR[l.id]}&quot;&gt;&lt;/div&gt;`).join(&quot;&quot;);
+  document.querySelectorAll(&quot;#levels input&quot;).forEach(cb =&gt; cb.addEventListener(&quot;change&quot;, () =&gt; {
+    const id = Number(cb.dataset.level);
+    cb.checked ? state.visible.add(id) : state.visible.delete(id);
+    drawBuildings();
+  }));
+  document.getElementById(&quot;source-note&quot;).textContent = state.source === &quot;predicted&quot;
+    ? &quot;Outlines found by the model. Click a building for its predicted level and confidence.&quot;
+    : &quot;Expert labels from xBD. Click a building to compare with the model.&quot;;
+}</code></pre></div></div><div class="chunk-text"><p>Rebuilds the checkboxes with counts and bars, and reconnects them so ticking a box redraws the map.</p></div></div><div class="chunk"><div class="chunk-code"><p class="where">lines 209–214</p><div class="code"><pre class="ln" aria-hidden="true">209
+210
+211
+212
+213
+214</pre><pre class="src"><code class="language-javascript">function drawAgreement() {
+  const labeled = features.filter(f =&gt; f.properties.source === &quot;true&quot;);
+  const same = labeled.filter(f =&gt; f.properties.model_damage === f.properties.damage).length;
+  document.getElementById(&quot;agreement&quot;).textContent = labeled.length
+    ? `${(100 * same / labeled.length).toFixed(1)}%  (${same.toLocaleString()} of ${labeled.length.toLocaleString()})` : &quot;–&quot;;
+}</code></pre></div></div><div class="chunk-text"><p>Share of labelled buildings where the model gave the same level.</p></div></div><div class="chunk"><div class="chunk-code"><p class="where">lines 216–233</p><div class="code"><pre class="ln" aria-hidden="true">216
+217
+218
+219
+220
+221
+222
+223
+224
+225
+226
+227
+228
+229
+230
+231
+232
+233</pre><pre class="src"><code class="language-javascript">function drawPriority(disasterTiles) {
+  const ranked = disasterTiles
+    .map(t =&gt; ({ t, destroyed: t.predicted[3], major: t.predicted[2] }))
+    .filter(r =&gt; r.destroyed + r.major &gt; 0)
+    .sort((a, b) =&gt; (b.destroyed * 2 + b.major) - (a.destroyed * 2 + a.major))
+    .slice(0, 10);
+  const list = document.getElementById(&quot;priority&quot;);
+  list.innerHTML = ranked.length ? ranked.map(r =&gt; `
+    &lt;li data-tile=&quot;${r.t.tile}&quot;&gt;&lt;span class=&quot;tile-name&quot;&gt;${r.t.tile.split(&quot;_&quot;).pop()}&lt;/span&gt;
+      &lt;span class=&quot;pill&quot; style=&quot;background:${COLOR[4]}&quot;&gt;${r.destroyed} destroyed&lt;/span&gt;
+      &lt;span class=&quot;pill&quot; style=&quot;background:${COLOR[3]}&quot;&gt;${r.major} major&lt;/span&gt;&lt;/li&gt;`).join(&quot;&quot;)
+    : &quot;&lt;li&gt;No damaged buildings predicted.&lt;/li&gt;&quot;;
+  list.querySelectorAll(&quot;li[data-tile]&quot;).forEach(li =&gt; li.addEventListener(&quot;click&quot;, () =&gt; {
+    const tile = tiles.find(t =&gt; t.tile === li.dataset.tile);
+    map.fitBounds(tile.bounds);
+    history.replaceState(null, &quot;&quot;, &quot;#&quot; + tile.tile);
+  }));
+}</code></pre></div></div><div class="chunk-text"><p>Ranks tiles by destroyed × 2 + major, keeps the top 10, and lets a click zoom to the tile and put its id in the address bar.</p></div></div><div class="chunk"><div class="chunk-code"><p class="where">lines 235–240</p><div class="code"><pre class="ln" aria-hidden="true">235
+236
+237
+238
+239
+240</pre><pre class="src"><code class="language-javascript">function drawTileOutlines(disasterTiles) {
+  if (tileLayer) tileLayer.remove();
+  tileLayer = L.layerGroup(disasterTiles.map(t =&gt;
+    L.rectangle(t.bounds, { color: &quot;#ffffff&quot;, weight: 1, opacity: 0.6, fill: false, interactive: false })
+  )).addTo(map);
+}</code></pre></div></div><div class="chunk-text"><p>A thin white rectangle around every tile.</p></div></div><div class="chunk"><div class="chunk-code"><p class="where">lines 242–259</p><div class="code"><pre class="ln" aria-hidden="true">242
+243
+244
+245
+246
+247
+248
+249
+250
+251
+252
+253
+254
+255
+256
+257
+258
+259</pre><pre class="src"><code class="language-javascript">function updateImagery() {
+  const showImages = state.imagery !== &quot;none&quot; &amp;&amp; map.getZoom() &gt;= IMAGE_MIN_ZOOM;
+  const view = map.getBounds().pad(0.2);
+  const wanted = new Set();
+  if (showImages) {
+    tiles.filter(t =&gt; t.disaster === state.disaster &amp;&amp; view.intersects(L.latLngBounds(t.bounds)))
+      .forEach(t =&gt; wanted.add(`${t.tile}_${state.imagery}`));
+  }
+  for (const [key, layer] of overlays) {
+    if (!wanted.has(key)) { layer.remove(); overlays.delete(key); }
+  }
+  for (const key of wanted) {
+    if (!overlays.has(key)) {
+      const tile = tiles.find(t =&gt; key.startsWith(t.tile + &quot;_&quot;));
+      overlays.set(key, L.imageOverlay(`images/${key}.jpg`, tile.bounds, { opacity: 1 }).addTo(map).bringToBack());
+    }
+  }
+}</code></pre></div></div><div class="chunk-text"><p>Runs after every pan or zoom: when zoomed in far enough, adds the before or after image of each tile in view (placed by its corner coordinates) and removes the ones out of view, so only a few images are loaded at a time.</p></div></div><div class="chunk"><div class="chunk-code"><p class="where">lines 261–271</p><div class="code"><pre class="ln" aria-hidden="true">261
+262
+263
+264
+265
+266
+267
+268
+269
+270
+271</pre><pre class="src"><code class="language-javascript">async function selectDisaster(name) {
+  state.disaster = name;
+  const disasterTiles = tiles.filter(t =&gt; t.disaster === name);
+  features = await loadDisaster(name);
+  drawTileOutlines(disasterTiles);
+  drawBuildings();
+  drawAgreement();
+  drawPriority(disasterTiles);
+  map.fitBounds(L.latLngBounds(disasterTiles.flatMap(t =&gt; t.bounds)));
+  updateImagery();
+}</code></pre></div></div><div class="chunk-text"><p>Switching hurricane: load its buildings, draw everything, and zoom to fit its tiles.</p></div></div><div class="chunk"><div class="chunk-code"><p class="where">lines 273–291</p><div class="code"><pre class="ln" aria-hidden="true">273
+274
+275
+276
+277
+278
+279
+280
+281
+282
+283
+284
+285
+286
+287
+288
+289
+290
+291</pre><pre class="src"><code class="language-javascript">async function init() {
+  const data = await (await fetch(&quot;data/tiles.json&quot;)).json();
+  tiles = data.tiles;
+  const disasters = [...new Set(tiles.map(t =&gt; t.disaster))].sort();
+  const select = document.getElementById(&quot;disaster&quot;);
+  select.innerHTML = disasters.map(d =&gt; {
+    return `&lt;option value=&quot;${d}&quot;&gt;${DISASTER_LABELS[d] || d}&lt;/option&gt;`;
+  }).join(&quot;&quot;);
+  select.addEventListener(&quot;change&quot;, () =&gt; selectDisaster(select.value));
+  bindSegment(&quot;source&quot;, v =&gt; { state.source = v; drawBuildings(); });
+  bindSegment(&quot;imagery&quot;, v =&gt; { state.imagery = v; overlays.forEach(l =&gt; l.remove()); overlays.clear(); updateImagery(); });
+  map.on(&quot;moveend&quot;, updateImagery);
+  // A link like index.html#hurricane-harvey_00000198 opens zoomed in on that tile
+  const linked = tiles.find(t =&gt; t.tile === location.hash.slice(1));
+  const start = linked ? linked.disaster : disasters.includes(&quot;hurricane-harvey&quot;) ? &quot;hurricane-harvey&quot; : disasters[0];
+  select.value = start;
+  await selectDisaster(start);
+  if (linked) map.fitBounds(linked.bounds);
+}</code></pre></div></div><div class="chunk-text"><p>Startup: read <code>tiles.json</code>, fill the menu, connect the controls, and open Harvey, or the tile named in the address, as in <code>#hurricane-harvey_00000198</code>.</p></div></div><div class="chunk"><div class="chunk-code"><p class="where">lines 293–299</p><div class="code"><pre class="ln" aria-hidden="true">293
+294
+295
+296
+297
+298
+299</pre><pre class="src"><code class="language-javascript">init().catch(err =&gt; {
+  document.getElementById(&quot;map&quot;).innerHTML =
+    `&lt;p style=&quot;padding:20px&quot;&gt;Could not load data/tiles.json. Run &lt;code&gt;python -m src.predict&lt;/code&gt; first, then serve this folder with &lt;code&gt;python -m http.server -d dashboard&lt;/code&gt;.&lt;br&gt;${err}&lt;/p&gt;`;
+});
+&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre></div></div><div class="chunk-text"><p>If startup fails (usually because <code>predict.py</code> was not run, or the page was opened without the server), show a message explaining what to do.</p></div></div></section>
+  <section class="file">
+    <h3>Other files</h3>
+    <ul>
+      <li><code>notebooks/01_explore_xbd.ipynb</code>: counts, damage distribution, building sizes and before/after examples, using <code>xbd.py</code>.</li>
+      <li><code>notebooks/02_building_localization.ipynb</code> and <code>03_damage_classification.ipynb</code>: training curves, predictions and the confusion matrix, read from <code>runs/</code>.</li>
+      <li><code>docs/build_report.py</code>: builds the Word report from the results and source code. <code>docs/build_study_guide.py</code>: builds this guide.</li>
+      <li><code>runs/overnight.sh</code> (not in git): waited for the localization run to end, then started damage v1.</li>
+    </ul>
+  </section>
+</section>
+
+<section class="section" id="results">
+  <h2>The results</h2>
+  <p>Validation (hold) chose epochs and versions; test was used once at the end and is the number to report.</p>
+  <div class="table-wrap"><table class="results">
+    <thead><tr><th>Measure</th><th>Validation</th><th>Test</th></tr></thead>
+    <tbody><tr><td>Localization F1 (finding buildings)</td><td>0.792</td><td>0.788</td></tr><tr><td>Damage score, v1</td><td>0.575</td><td>0.584</td></tr><tr><td>Damage score, v2</td><td>0.402</td><td>—</td></tr><tr><td>Damage score, v3 (final)</td><td>0.711</td><td>0.702</td></tr><tr><td>v3: buildings at the right level</td><td>77.7%</td><td>80.8%</td></tr><tr><td>v3 F1: no / minor / major / destroyed</td><td>0.91 / 0.45 / 0.69 / 0.80</td><td>0.93 / 0.42 / 0.69 / 0.82</td></tr></tbody>
+  </table></div>
+</section>
+
+<section class="section" id="quiz">
+  <h2>Test yourself</h2>
+  <p>Questions a committee is likely to ask. Answer out loud first, then open the answer.</p>
+  <details class="q"><summary>Why are there two models instead of one?</summary><p>Finding buildings and judging damage are different tasks. Buildings are clearest in the before image, before any damage; damage needs both images. Splitting them keeps each model&#x27;s job simple. (In practice the damage model also found buildings slightly better, F1 0.82 vs 0.79, because it sees both images.)</p></details><details class="q"><summary>Why train on 512 × 512 crops if tiles are 1024 × 1024?</summary><p>Four times less memory per example, so a batch of 8 fits on the laptop GPU, and each epoch sees a different random quarter of each tile, which acts as extra variety.</p></details><details class="q"><summary>Why normalise with the ImageNet mean and standard deviation?</summary><p>The encoder&#x27;s pretrained weights were learned on images normalised that way. Feeding differently scaled numbers would make its learned features less useful at the start.</p></details><details class="q"><summary>Why add Dice loss to cross-entropy for the localization model?</summary><p>About 85% of pixels are background. Cross-entropy counts pixels, so small buildings contribute little. Dice is a ratio of overlapping areas, so a missed small building matters as much as a large stretch of background.</p></details><details class="q"><summary>Why did v2 fail?</summary><p>Minor and major damage are the two levels the model confuses most. With minor weighted 6 and major 3, calling an uncertain building &quot;minor&quot; became the cheaper mistake, so the model almost stopped predicting major. The harmonic mean then pulled the score down.</p></details><details class="q"><summary>Why did v3 work?</summary><p>Equal weights for minor and major meant neither was the safer guess; starting from v1 kept what v1 already knew about major damage; the lower learning rate refined rather than overwrote it; and tier3 tripled the data. v3 changed all of these at once, so the gain cannot be attributed to one change.</p></details><details class="q"><summary>Why is v3&#x27;s building accuracy not higher than v1&#x27;s, if its score is much higher?</summary><p>v3 finds far more minor-damage buildings, but also calls about 11–14% of undamaged buildings minor. Undamaged buildings are the large majority, so plain accuracy stays about the same, while the score, which weights all four levels equally, rises sharply.</p></details><details class="q"><summary>Why is the test score the one to report?</summary><p>The hold split was used to choose epochs and versions, so its scores are slightly optimistic. The test split was never used for any decision, so it is the honest estimate of performance on new data.</p></details><details class="q"><summary>How do we know the label coordinates are right and the GeoTIFF tags wrong?</summary><p>Three independent pieces of evidence: the tags use exactly the same degrees for longitude and latitude, which is only correct at the equator; the error grows with latitude exactly as that mistake predicts (1 m at Palu, 49 m in Portugal); and on an independent Esri basemap the label placement lines up while the tag placement shows every building doubled. The OpenStreetMap comparison adds a fourth.</p></details><details class="q"><summary>What would you improve next?</summary><p>A Siamese network (one shared encoder for before and after), splitting touching buildings (watershed), ensembles and test-time augmentation, and fine-tuning on data from the affected region.</p></details>
+</section>
+</div>
+
+<script>
+if (window.hljs) document.querySelectorAll("pre.src code").forEach(el => hljs.highlightElement(el));
+</script>
