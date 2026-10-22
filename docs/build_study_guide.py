@@ -724,6 +724,280 @@ RESULTS = [
 ]
 
 
+# ====================================================================== part 1: from zero
+
+PRIMER = [
+("Comments: notes for people",
+ '# OpenCV\'s own thread pool can deadlock inside DataLoader worker processes\ncv2.setNumThreads(0)',
+ "<p>Anything after a <code>#</code> is a <b>comment</b>: a note for humans. The computer skips it. Text inside "
+ "triple quotes <code>\"\"\" ... \"\"\"</code> at the top of a file or function is also a note, called a docstring. "
+ "So the first line here does nothing; the second line is the actual instruction.</p>"),
+("Variables: a name for a value",
+ 'JPEG_QUALITY = 95\nRAW_ROOT = Path("data/xbd")',
+ "<p>The <code>=</code> sign means <b>“store this value under this name”</b>, not “is equal to”. After the first line, "
+ "writing <code>JPEG_QUALITY</code> anywhere means 95. Names in CAPITALS are, by habit, values that never change.</p>"),
+("Kinds of values",
+ 'tiles = 2799            # a whole number\nlr = 3e-4               # a decimal: 3 × 10⁻⁴ = 0.0003\nsplit = "tier1"         # text, called a string\npretrained = True       # yes/no, called a boolean',
+ "<p>Values have types: whole numbers, decimal numbers, text in quotes, and <code>True</code>/<code>False</code>. "
+ "<code>3e-4</code> is scientific notation, short for 0.0003.</p>"),
+("Lists: several values in order",
+ 'SPLITS = ["tier1", "tier3", "hold", "test"]\nSPLITS[0]     # "tier1"\nSPLITS[1]     # "tier3"',
+ "<p>Square brackets make a <b>list</b>. Items are numbered from <b>0</b>, not 1, so <code>SPLITS[0]</code> is the "
+ "first item. This catches every beginner once.</p>"),
+("Dictionaries: look up a value by name",
+ 'MASK_VALUES = {\n    "no-damage": 1,\n    "minor-damage": 2,\n    "major-damage": 3,\n    "destroyed": 4,\n}\nMASK_VALUES["destroyed"]   # 4',
+ "<p>Curly braces make a <b>dictionary</b>: pairs of <i>key: value</i>, like a real dictionary of word: meaning. "
+ "Here, looking up <code>\"destroyed\"</code> gives 4, the number written into the mask for destroyed buildings.</p>"),
+("Functions: a reusable recipe",
+ 'def polygon_area(points):\n    x, y = points[:, 0], points[:, 1]\n    return 0.5 * abs(np.dot(x, np.roll(y, 1)) - np.dot(y, np.roll(x, 1)))\n\narea = polygon_area(corners)',
+ "<p><code>def</code> <b>defines</b> a function: a named recipe with ingredients (<code>points</code>) that hands back "
+ "a result with <code>return</code>. Defining it does nothing yet; the last line <b>calls</b> it, giving it real "
+ "corners and storing the answer in <code>area</code>. Most of this project is functions like this.</p>"),
+("Indentation: what belongs to what",
+ 'def pick_device():\n    if torch.cuda.is_available():\n        return torch.device("cuda")\n    if torch.backends.mps.is_available():\n        return torch.device("mps")\n    return torch.device("cpu")',
+ "<p>Python uses <b>indentation</b> (spaces at the start of a line) to show structure. Every line indented under "
+ "<code>def</code> is part of the function; a line indented under <code>if</code> runs only if the condition is true. "
+ "Getting indentation wrong changes what the program does.</p>"),
+("Decisions: if",
+ 'if last_path.exists():\n    print("resuming")\nelse:\n    print("starting fresh")',
+ "<p><code>if</code> runs the indented lines only when the condition is true; <code>else</code> covers the other case. "
+ "Note <code>==</code> (two signs) asks “are these equal?”, while <code>=</code> (one sign) stores a value.</p>"),
+("Repetition: for loops",
+ 'for split in SPLITS:\n    process_split(split)',
+ "<p>A <code>for</code> loop repeats the indented lines once per item: here 4 times, with <code>split</code> being "
+ "<code>\"tier1\"</code>, then <code>\"tier3\"</code>, and so on. Training is a loop inside a loop: for each epoch, for "
+ "each batch, learn a little.</p>"),
+("Imports: borrowing toolboxes",
+ 'import numpy as np\nimport torch\nfrom src.xbd import load_image',
+ "<p>Nobody writes everything from scratch. <code>import</code> loads a toolbox (a <b>library</b>) written by others: "
+ "<code>numpy</code> for maths on big grids of numbers, <code>torch</code> (PyTorch) for neural networks. "
+ "<code>as np</code> gives it a short nickname. The last line borrows one function from our own file "
+ "<code>src/xbd.py</code>.</p>"),
+("Dots: asking a thing to do something",
+ 'out_dir.mkdir(parents=True, exist_ok=True)\nmodel.train()\nloss.backward()',
+ "<p>A dot means “<b>this thing’s</b> ability”: <code>out_dir.mkdir()</code> asks the folder path to create itself; "
+ "<code>model.train()</code> puts the model in training mode. Words inside the brackets like "
+ "<code>parents=True</code> are options.</p>"),
+("Text with values inside: f-strings",
+ 'print(f"{split}: {i}/{len(jobs)} tiles")\n# prints, for example:  hold: 500/933 tiles',
+ "<p>A string with <code>f</code> before the quote fills in anything inside <code>{ }</code> with its current value. "
+ "<code>print</code> shows the text in the terminal. <code>len(jobs)</code> is the number of items in the list.</p>"),
+("Grids of numbers and slicing",
+ 'image.shape                     # (1024, 1024, 3)\ncrop = image[y:y + 512, x:x + 512]',
+ "<p>An image is a grid of numbers with a <b>shape</b>: 1024 rows, 1024 columns, 3 colours. "
+ "<code>a:b</code> means “from position a up to, not including, b”, so the second line cuts out a 512 × 512 square "
+ "starting at row <code>y</code>, column <code>x</code>.</p>"),
+("Classes: a blueprint",
+ 'class BuildingDataset(Dataset):\n    def __len__(self):\n        return len(self.mask_paths)\n\ntrain_ds = BuildingDataset(["data/processed/tier1"])',
+ "<p>A <code>class</code> is a blueprint for an object that holds data and functions together. The last line builds "
+ "one object from it. Inside, <code>self</code> means “this particular object”. PyTorch requires datasets to be "
+ "classes with certain functions (<code>__len__</code>, <code>__getitem__</code>), so it knows how to ask for examples.</p>"),
+("Start here: the main block",
+ 'if __name__ == "__main__":\n    main()',
+ "<p>This odd-looking line means “<b>run this only when the file is started as a program</b>”, not when another "
+ "file borrows functions from it. It is the entry point of every command you ran, like "
+ "<code>python -m src.train</code>.</p>"),
+]
+
+COMMAND_PARTS = [
+("nohup", "Keep running even if the terminal or VS Code is closed (“no hang-up”)."),
+("caffeinate -i", "A Mac command that stops the computer from going to sleep while the next command runs."),
+("/opt/anaconda3/bin/python3", "Which program to run: the Python language installed by Anaconda."),
+("-m src.train", "Tell Python to run the file <code>src/train.py</code> as a program (<b>m</b>odule)."),
+("--epochs 30", "An option for our program: go through all training images 30 times."),
+("> runs/loc_resnet34/train.log", "Instead of printing to the screen, write the output into this log file."),
+("2>&1", "Send error messages to the same log file too."),
+("&", "Start it in the background, so the terminal is free for other commands."),
+]
+
+def pixel_svg():
+    """A tiny 'roof on grass' image as a grid of grey values, with each value printed."""
+    grid = [
+        [ 60,  62,  58,  61,  63,  59,  60,  62],
+        [ 61, 190, 200, 205, 198, 195,  58,  60],
+        [ 59, 195, 210, 215, 212, 200,  61,  63],
+        [ 62, 198, 214, 220, 216, 204,  60,  59],
+        [ 60, 192, 206, 210, 207, 197,  62,  61],
+        [ 63,  64,  60,  62,  59,  61,  64,  60],
+    ]
+    cell = 46
+    parts = [f'<svg viewBox="0 0 {8 * cell} {6 * cell}" role="img" aria-label="A grid of 6 by 8 pixels: dark values around 60 for grass, bright values around 200 for a roof in the middle" class="pixels">']
+    for r, row in enumerate(grid):
+        for c, v in enumerate(row):
+            ink = "#111" if v > 128 else "#eee"
+            parts.append(f'<rect x="{c * cell}" y="{r * cell}" width="{cell}" height="{cell}" fill="rgb({v},{v},{v})" stroke="#888" stroke-width="0.5"/>')
+            parts.append(f'<text x="{c * cell + cell / 2}" y="{r * cell + cell / 2 + 5}" text-anchor="middle" font-size="14" fill="{ink}" font-family="monospace">{v}</text>')
+    parts.append("</svg>")
+    return "".join(parts)
+
+
+def render_beginner():
+    def ex(code, lang="python"):
+        return f'<div class="code"><pre class="src"><code class="language-{lang}">{html.escape(code)}</code></pre></div>'
+    primer = "".join(f'<div class="chunk"><div class="chunk-code"><p class="where">{html.escape(t)}</p>{ex(c)}</div>'
+                     f'<div class="chunk-text">{e}</div></div>' for t, c, e in PRIMER)
+    command = "".join(f"<tr><td><code>{html.escape(a)}</code></td><td>{b}</td></tr>" for a, b in COMMAND_PARTS)
+    return BEGINNER_HTML.replace("{{PRIMER}}", primer).replace("{{COMMAND}}", command).replace("{{PIXELS}}", pixel_svg())
+
+
+BEGINNER_HTML = r"""
+<div class="part"><p class="eyebrow">Part 1</p><h2 class="part-title">Start from zero</h2>
+<p class="lede">No code or AI knowledge needed. Read these in order; each one uses only what came before.</p></div>
+
+<section class="section" id="z-program">
+  <h2>1. What a program is</h2>
+  <p>A computer does exactly what it is told, one instruction at a time, and nothing more. A <b>program</b> is a
+  list of those instructions written in a <b>programming language</b>, like a very precise recipe. This project is
+  written in <b>Python</b>, a language popular for science and AI because it reads almost like English.</p>
+  <p>The instructions live in plain text files ending in <code>.py</code>, inside the <code>src</code> folder.
+  <code>src/train.py</code>, for example, is 170 lines of instructions for teaching the building-finding model.
+  Nothing happens until you <b>run</b> a file, which you do by typing a command in the <b>terminal</b>.</p>
+</section>
+
+<section class="section" id="z-terminal">
+  <h2>2. The terminal: typing commands</h2>
+  <p>The terminal (in VS Code: Terminal → New Terminal) is a window where you type commands instead of clicking.
+  Each line is one command; you press Enter and the computer does it. Two you used often:</p>
+  {{CMD_EXAMPLES}}
+  <p>The command that trained the first model looks scary, but every word has one simple job:</p>
+  <pre class="cmd">nohup caffeinate -i /opt/anaconda3/bin/python3 -m src.train --epochs 30 &gt; runs/loc_resnet34/train.log 2&gt;&amp;1 &amp;</pre>
+  <div class="table-wrap"><table class="results"><thead><tr><th>Piece</th><th>What it does</th></tr></thead><tbody>{{COMMAND}}</tbody></table></div>
+  <p><b>Git</b> is a separate tool that keeps the history of your files. A <b>commit</b> is a saved snapshot with a
+  message (“Add damage map dashboard”); a <b>push</b> uploads your snapshots to GitHub so they are backed up and
+  shareable.</p>
+</section>
+
+<section class="section" id="z-python">
+  <h2>3. Reading Python in 15 small pieces</h2>
+  <p>You do not need to write Python to understand this project, only to recognise these building blocks. Every
+  example below is taken from your own code, sometimes shortened.</p>
+  {{PRIMER}}
+</section>
+
+<section class="section" id="z-ai">
+  <h2>4. What “AI” and “learning” mean here</h2>
+  <p>Normally a programmer writes the rules: <i>if the roof is missing, the building is destroyed</i>. But nobody can
+  write rules precise enough for thousands of satellite photos: shadows, trees, flood water and different roof
+  colours all look different. <b>Machine learning</b> turns this around: instead of rules, we give the computer
+  <b>examples with the right answers</b>, and it adjusts itself until its answers match.</p>
+  <p>Think of a model as a machine with millions of <b>knobs</b>. Each knob slightly changes how it turns a photo
+  into an answer. At the start the knobs are set randomly, so the answers are nonsense. Learning is the process of
+  turning the knobs, little by little, so the answers get closer to the experts’ answers:</p>
+  <ol>
+    <li><b>Guess.</b> Show the model a photo; it gives an answer.</li>
+    <li><b>Measure the mistake.</b> Compare with the expert’s answer and compute one number for how wrong it was. This number is the <b>loss</b>.</li>
+    <li><b>Find which way to turn each knob.</b> For every knob, work out whether turning it up or down would make the loss smaller. This direction is the <b>gradient</b>.</li>
+    <li><b>Turn every knob a little</b> in that direction. How far is the <b>learning rate</b>.</li>
+    <li><b>Repeat</b> with the next photos, hundreds of thousands of times.</li>
+  </ol>
+  <p>The knobs are called <b>parameters</b>. Your building-finding model has 24,436,369 of them. The next section
+  lets you watch the same process with just <b>one</b> knob.</p>
+</section>
+
+<section class="section" id="z-demo">
+  <h2>5. Watch a model learn</h2>
+  <p>The dots below are made-up measurements: rainfall (across) and flood water depth (up). The true rule is
+  “depth is about 3 × rainfall”, but the model does not know that. It has one knob, <b>w</b>, and guesses
+  <i>depth = w × rainfall</i>. It starts with w = 0.5, a bad guess. Press <b>Take one learning step</b> and watch the
+  line, the knob and the loss.</p>
+  <div class="demo">
+    <svg id="demo-plot" viewBox="0 0 560 300" role="img" aria-label="Scatter plot of rainfall against flood depth with the model's current line"></svg>
+    <div class="demo-side">
+      <div class="demo-stats">
+        <div><span class="k">Knob w</span><span class="v" id="demo-w">0.50</span></div>
+        <div><span class="k">Loss (how wrong)</span><span class="v" id="demo-loss">–</span></div>
+        <div><span class="k">Steps taken</span><span class="v" id="demo-steps">0</span></div>
+      </div>
+      <fieldset class="demo-lr"><legend>Learning rate (how far to turn the knob)</legend>
+        <label><input type="radio" name="lr" id="lr-small" value="0.003"> Too small: 0.003</label>
+        <label><input type="radio" name="lr" id="lr-good" value="0.015" checked> Good: 0.015</label>
+        <label><input type="radio" name="lr" id="lr-big" value="0.042"> Too large: 0.042</label>
+      </fieldset>
+      <div class="demo-buttons">
+        <button type="button" id="demo-step">Take one learning step</button>
+        <button type="button" id="demo-ten">Take 10 steps</button>
+        <button type="button" id="demo-reset" class="ghost">Start over</button>
+      </div>
+      <p class="demo-msg" id="demo-msg">The line is far below the dots, so the loss is large.</p>
+    </div>
+  </div>
+  <p>Try all three learning rates. <b>Too small</b> and the model creeps towards the answer. <b>Good</b> and it gets
+  there in a few steps. <b>Too large</b> and each step overshoots, so it swings back and forth and gets worse. Early in
+  your real training, with a high learning rate, the validation score jumped from 0.78 to 0.49 and back for the same
+  reason; the cosine schedule then lowered the learning rate, and the score settled.</p>
+  <p>Your real models do exactly this, but with 24 million knobs at once, and the loss measured on photos instead of
+  dots. The code that does it is in <code>train.py</code>, lines 116–124: guess, loss, gradient
+  (<code>loss.backward()</code>), turn the knobs (<code>optimizer.step()</code>).</p>
+</section>
+
+<section class="section" id="z-images">
+  <h2>6. How a computer sees a photo</h2>
+  <div class="two">
+    <div>{{PIXELS}}</div>
+    <div>
+      <p>To a computer, a photo is a <b>grid of numbers</b>. Each square (<b>pixel</b>) holds a brightness from 0 (black)
+      to 255 (white). Here, a bright roof (about 200) sits on dark grass (about 60). A colour photo has three such
+      grids, for red, green and blue.</p>
+      <p>Each xBD photo is 1,024 × 1,024 pixels, about half a metre of ground per pixel, so a typical house is about
+      25 × 25 pixels. One photo is 3 million numbers.</p>
+    </div>
+  </div>
+  <p>A model finds patterns in these numbers with small <b>filters</b>: tiny 3 × 3 grids of knobs that slide over
+  the photo and respond strongly where they find their pattern. One filter might respond to a sharp jump from 60 to
+  200, which is an <b>edge</b>, like the roof’s border above. The model stacks many layers of filters:</p>
+  <ol>
+    <li>first layers find edges and colours;</li>
+    <li>middle layers combine edges into corners, lines and textures;</li>
+    <li>deeper layers combine those into roofs, trees, roads and water;</li>
+    <li>the last layer decides, for every single pixel, “building” or “not building”.</li>
+  </ol>
+  <p>The model used here is called a <b>U-Net</b>. Its first half shrinks the photo step by step while finding
+  more abstract patterns, and its second half grows it back to full size so it can give an answer for every pixel.
+  It is shaped like a U when drawn, hence the name. Its first half was <b>pretrained</b> on 1.2 million everyday
+  photos, so it already knew edges and textures before seeing a single satellite image.</p>
+  <p>The answer is itself an image, called a <b>mask</b>: white where the model sees a building, black elsewhere.
+  The damage model gives a mask where each building pixel holds a damage level instead.</p>
+</section>
+
+<section class="section" id="z-story">
+  <h2>7. Your project as a story</h2>
+  <div class="story">
+    <p><b>The question.</b> After a hurricane, which buildings are damaged, and how badly? People need the answer in
+    hours, not days.</p>
+    <p><b>The examples.</b> The xBD dataset has 11,034 pairs of satellite photos, before and after 19 disasters. Experts
+    outlined every building and marked its damage: none, minor, major or destroyed.</p>
+    <p><b>Preparing the examples.</b> The photos were stored in a large, slow format (130 GB). We converted them to
+    9 GB of normal JPEG photos, plus one mask per photo saying what each pixel is.</p>
+    <p><b>Teaching the first model</b> to find buildings. It looked at 2,799 before-photos, 8 at a time, comparing its
+    guesses with the experts’ outlines and turning its 24 million knobs a little after each group. One pass through
+    all the photos is an <b>epoch</b>; it did 30 epochs overnight, about 3.5 hours.</p>
+    <p><b>Teaching the second model</b> to judge damage. Same idea, but it sees the before and after photo together, so
+    it can compare them, and it answers with a damage level for each building pixel.</p>
+    <p><b>Checking honestly.</b> During training we checked on 933 photos the models never learned from (validation)
+    to choose the best version. At the very end, we tested once on 933 more photos that were never used for any
+    choice (test): the final model found buildings with an F1 of 0.79 and gave 80.8% of buildings the right damage
+    level.</p>
+    <p><b>Improving.</b> The first damage model rarely recognised minor damage. A second attempt over-corrected and
+    broke major damage; a third, balanced attempt improved the overall score from 0.58 to 0.70 on the test photos.</p>
+    <p><b>The map.</b> The models’ answers were turned into building outlines with real-world coordinates and drawn on
+    an interactive map. Doing that revealed that the dataset’s own coordinate tags put buildings about 30 m off,
+    which we measured across all 22,068 photos and corrected.</p>
+  </div>
+  <p>Part 2 below tells the same story in full detail, then walks through every line of code.</p>
+</section>
+
+<div class="part"><p class="eyebrow">Part 2</p><h2 class="part-title">The project in detail</h2>
+<p class="lede">The concepts with their proper names, everything that was run, and the code itself.</p></div>
+"""
+
+CMD_EXAMPLES = (
+    '<div class="table-wrap"><table class="results"><thead><tr><th>Command</th><th>What it does</th></tr></thead><tbody>'
+    '<tr><td><code>cd ~/Desktop/fyp</code></td><td>Go into the project folder (“change directory”). <code>~</code> means your home folder.</td></tr>'
+    '<tr><td><code>/opt/anaconda3/bin/python3 -m src.progress</code></td><td>Run the program in <code>src/progress.py</code> with Anaconda’s Python.</td></tr>'
+    '</tbody></table></div>')
+BEGINNER_HTML = BEGINNER_HTML.replace("{{CMD_EXAMPLES}}", CMD_EXAMPLES)
+
+
 # ====================================================================== rendering
 
 def chunks(path, anchors):
@@ -786,7 +1060,7 @@ def render():
     questions = "".join(f"<details class=\"q\"><summary>{html.escape(q)}</summary><p>{html.escape(a)}</p></details>"
                         for q, a in QUESTIONS)
 
-    page = TEMPLATE.replace("{{TOC_FILES}}", "".join(toc_files)).replace("{{CONCEPTS}}", concepts) \
+    page = TEMPLATE.replace("{{BEGINNER}}", render_beginner()).replace("{{TOC_FILES}}", "".join(toc_files)).replace("{{CONCEPTS}}", concepts) \
         .replace("{{TIMELINE}}", timeline).replace("{{ONE_STEP}}", ONE_STEP).replace("{{FILES}}", "".join(file_sections)) \
         .replace("{{RESULTS}}", results).replace("{{QUESTIONS}}", questions)
     OUT.write_text(page)
@@ -880,24 +1154,56 @@ details.q { background: var(--surface); border: 1px solid var(--line); border-ra
 details.q summary { cursor: pointer; font-weight: 600; }
 details.q p { margin: 10px 0 0; }
 :focus-visible { outline: 2px solid var(--link); outline-offset: 2px; }
+.part { display: flex; flex-direction: column; gap: 10px; padding: 28px 0 4px; }
+h2.part-title { font-size: clamp(32px, 4.4vw, 44px); border-top: none; padding-top: 0; }
+.two { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 24px; align-items: start; }
+svg.pixels { width: 100%; max-width: 420px; height: auto; border-radius: 8px; }
+.story { display: flex; flex-direction: column; gap: 2px; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 8px 24px; }
+.demo { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 20px; background: var(--surface);
+  border: 1px solid var(--line); border-radius: 10px; padding: 18px; }
+#demo-plot { width: 100%; height: auto; }
+.demo-side { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.demo-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.demo-stats div { display: flex; flex-direction: column; gap: 2px; }
+.demo-stats .k { font: 600 12px var(--body); letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted); }
+.demo-stats .v { font: 600 26px var(--mono); font-variant-numeric: tabular-nums; }
+.demo-lr { border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px 10px; display: flex; flex-direction: column; gap: 4px; margin: 0; }
+.demo-lr legend { font-weight: 600; padding: 0 4px; }
+.demo-buttons { display: flex; flex-wrap: wrap; gap: 8px; }
+.demo-buttons button { font: 600 15px var(--body); padding: 9px 14px; border-radius: 8px; border: 1px solid var(--ink);
+  background: var(--ink); color: var(--bg); cursor: pointer; }
+.demo-buttons button.ghost { background: transparent; color: var(--ink); }
+.demo-msg { margin: 0; color: var(--muted); min-height: 3em; }
+@media (max-width: 860px) { .two, .demo { grid-template-columns: minmax(0, 1fr); } .demo-stats .v { font-size: 20px; } }
 @media (max-width: 860px) { .chunk { grid-template-columns: minmax(0, 1fr); } body { font-size: 16px; } }
 </style>
 
 <div class="wrap">
 <header>
   <p class="eyebrow">Hurricane Damage Mapper · Master’s project · Lamar University</p>
-  <h1>Study guide: the whole project, step by step</h1>
-  <p class="lede">Every concept, every step that was run, and every code file chunk by chunk with line numbers, so you can explain any part of the project in your own words.</p>
+  <h1>Study guide: the whole project, from zero</h1>
+  <p class="lede">Starts with what a program is and what “learning” means, then builds up to every step that was run and every line of code, so you can explain any part of the project in your own words.</p>
 </header>
 
 <section class="section">
   <div class="howto">
-    <div><b>New to deep learning?</b>Read “Concepts” first. Each card explains one idea with this project’s own numbers.</div>
-    <div><b>Want the story?</b>“What was done, in order” lists every step from download to final test, with the commands.</div>
+    <div><b>Never written code?</b>Start with Part 1 and read it in order. It assumes nothing and takes about an hour.</div>
+    <div><b>Know the basics?</b>Skip to Part 2: concepts, the full timeline with commands, and the code walkthrough.</div>
     <div><b>Preparing for questions?</b>Read the code walkthrough with the file open in VS Code, then try “Test yourself”.</div>
   </div>
   <nav class="toc" aria-label="Contents">
-    <div><strong>Contents</strong>
+    <div><strong>Part 1 · Start from zero</strong>
+      <ol>
+        <li><a href="#z-program">What a program is</a></li>
+        <li><a href="#z-terminal">The terminal: typing commands</a></li>
+        <li><a href="#z-python">Reading Python in 15 small pieces</a></li>
+        <li><a href="#z-ai">What “AI” and “learning” mean here</a></li>
+        <li><a href="#z-demo">Watch a model learn</a></li>
+        <li><a href="#z-images">How a computer sees a photo</a></li>
+        <li><a href="#z-story">Your project as a story</a></li>
+      </ol>
+    </div>
+    <div><strong>Part 2 · The project in detail</strong>
       <ol>
         <li><a href="#picture">The project in one picture</a></li>
         <li><a href="#concepts">Concepts</a></li>
@@ -911,6 +1217,8 @@ details.q p { margin: 10px 0 0; }
     <div><strong>Code files</strong><ul>{{TOC_FILES}}</ul></div>
   </nav>
 </section>
+
+{{BEGINNER}}
 
 <section class="section" id="picture">
   <h2>The project in one picture</h2>
@@ -977,6 +1285,49 @@ flowchart LR
 </div>
 
 <script>
+(() => {
+  const xs = [1, 2, 3, 4, 5, 6, 7, 8];
+  const ys = [3.4, 5.7, 9.3, 11.6, 15.4, 17.5, 21.6, 23.8];   // roughly 3 x rainfall, with noise
+  let w = 0.5, steps = 0, previousLoss = null;
+  const svg = document.getElementById("demo-plot");
+  if (!svg) return;
+  const X = x => 50 + x * 58, Y = y => 270 - y * 9.5;
+  const lossOf = v => xs.reduce((s, x, i) => s + (v * x - ys[i]) ** 2, 0) / xs.length;
+  const gradOf = v => xs.reduce((s, x, i) => s + 2 * (v * x - ys[i]) * x, 0) / xs.length;
+  const lr = () => Number(document.querySelector('input[name="lr"]:checked').value);
+  function draw() {
+    const ink = "var(--ink)", muted = "var(--muted)", accent = "var(--accent)";
+    let g = `<line x1="50" y1="270" x2="530" y2="270" stroke="${muted}"/><line x1="50" y1="270" x2="50" y2="10" stroke="${muted}"/>`;
+    for (const t of [0, 2, 4, 6, 8]) g += `<text x="${X(t)}" y="290" text-anchor="middle" font-size="13" fill="${muted}">${t}</text>`;
+    for (const t of [0, 10, 20]) g += `<text x="40" y="${Y(t) + 4}" text-anchor="end" font-size="13" fill="${muted}">${t}</text>`;
+    g += `<text x="530" y="260" text-anchor="end" font-size="13" fill="${muted}">rainfall (cm)</text>`;
+    g += `<text x="58" y="22" font-size="13" fill="${muted}">depth (cm)</text>`;
+    const xEnd = Math.min(8.5, Math.max(0.2, 26 / Math.max(Math.abs(w), 0.01)));
+    const yEnd = Math.max(-1, Math.min(27, w * xEnd));
+    g += `<line x1="${X(0)}" y1="${Y(0)}" x2="${X(xEnd)}" y2="${Y(yEnd)}" stroke="${accent}" stroke-width="3"/>`;
+    xs.forEach((x, i) => {
+      g += `<line x1="${X(x)}" y1="${Y(ys[i])}" x2="${X(x)}" y2="${Y(Math.max(-1, Math.min(27, w * x)))}" stroke="${accent}" stroke-opacity="0.35" stroke-dasharray="3 3"/>`;
+      g += `<circle cx="${X(x)}" cy="${Y(ys[i])}" r="6" fill="${ink}"/>`;
+    });
+    svg.innerHTML = g;
+    const loss = lossOf(w);
+    document.getElementById("demo-w").textContent = Math.abs(w) < 1000 ? w.toFixed(2) : w.toExponential(1);
+    document.getElementById("demo-loss").textContent = loss < 1e5 ? loss.toFixed(1) : loss.toExponential(1);
+    document.getElementById("demo-steps").textContent = steps;
+    let msg;
+    if (steps === 0) msg = "The line is far below the dots, so the loss is large. The dashed lines are the mistakes.";
+    else if (previousLoss !== null && loss > previousLoss) msg = "The loss went UP: the step overshot the answer, so the knob swings further each time. The learning rate is too large.";
+    else if (Math.abs(w - 3.003) < 0.01) msg = "Learned: w is 3.00, the true rule. The loss cannot reach 0 because the measurements are noisy.";
+    else msg = `Each step turns the knob against the gradient (${gradOf(w).toFixed(1)}). Watch the loss shrink.`;
+    document.getElementById("demo-msg").textContent = msg;
+  }
+  function step(n) { for (let i = 0; i < n; i++) { previousLoss = lossOf(w); w -= lr() * gradOf(w); steps++; } draw(); }
+  document.getElementById("demo-step").addEventListener("click", () => step(1));
+  document.getElementById("demo-ten").addEventListener("click", () => step(10));
+  document.getElementById("demo-reset").addEventListener("click", () => { w = 0.5; steps = 0; previousLoss = null; draw(); });
+  document.querySelectorAll('input[name="lr"]').forEach(r => r.addEventListener("change", () => { w = 0.5; steps = 0; previousLoss = null; draw(); }));
+  draw();
+})();
 if (window.hljs) document.querySelectorAll("pre.src code").forEach(el => hljs.highlightElement(el));
 </script>
 """
